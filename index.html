@@ -90,6 +90,17 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);o
 .pill.dk .caret{color:var(--ink-3);font-size:9px}
 .pill.dk .ct{font:400 9.5px/1 "IBM Plex Mono",monospace;color:var(--ink-3);letter-spacing:0}
 .pill.dk .ct:empty{display:none}
+/* Zoom gauge: during a pinch, where the scale sits between the level's native size and the switch to the other level. */
+.zg{position:absolute;left:0;top:0;z-index:6;display:flex;align-items:center;gap:9px;height:24px;padding:0 9px;border-radius:5px;background:var(--scrim);box-shadow:0 0 0 1px var(--rule);font:500 10.5px/1 "IBM Plex Mono",monospace;color:var(--ink-3);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .14s ease}
+.zg.on{opacity:1}
+.zg .t{position:relative;width:96px;height:4px;border-radius:2px;background:var(--rule)}
+.zg .z{position:absolute;top:0;bottom:0;border-radius:2px;background:color-mix(in oklab,var(--accent) 38%,var(--rule));transition:background .12s ease}
+.zg .one{position:absolute;top:-2px;width:1px;height:8px;background:var(--ink-3)}
+.zg .m{position:absolute;top:-4px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--panel);box-shadow:0 0 0 1.5px var(--ink-2)}
+.zg.armed .z{background:var(--accent-strong)}
+.zg.armed .m{box-shadow:0 0 0 2px var(--accent-strong)}
+.zg.armed .a,.zg.armed .b{color:var(--ink)}
+.zg.armed .goal{font-weight:600}
 .viewport{position:absolute;left:0;top:var(--A);right:0;bottom:0;overflow:hidden;touch-action:none;overscroll-behavior:none;cursor:grab}
 .viewport.dragging{cursor:grabbing}
 /* Horizontal overflow fades to the panel colour: a neutral "continues" cue that leaves the ribbon hues alone and
@@ -106,9 +117,8 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);o
 /* The ribbons are their own compositor layer, carrying the same camera transform as the world. Kept apart
    from the tiles, a tile mounting during a pan no longer forces the blurred ribbons to re-rasterize. */
 .bounds{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;transform-origin:0 0;will-change:transform}
-/* A level change leaves a frozen copy of the outgoing level behind, which keeps travelling in the zoom's direction as it fades. */
-.ghost{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform,opacity;pointer-events:none}
-.ghost>*{position:absolute;left:0;top:0;will-change:auto}
+/* During a level change the outgoing world and ribbons become ghosts that keep travelling in the zoom's direction as they fade. */
+.ghost{pointer-events:none}
 .bounds path{fill-opacity:.055;stroke:none}
 /* Feathered lane boundaries. The blur is applied in world space, inside the transformed layer, so it
    scales with a pinch instead of fighting it, and it is rendered once per level change. A softened
@@ -173,6 +183,7 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);o
       <div class="axis" id="axis"></div>
       <div class="viewport" id="vp"><div class="vlines" id="vlines"></div><svg class="bounds" id="ribbons"></svg><div class="world" id="world"></div><i class="pan-edge left"></i><i class="pan-edge right"></i></div>
       <div class="labels" id="labels"></div>
+      <div class="zg" id="zg" aria-hidden="true"><span class="a"></span><span class="t"><i class="z"></i><i class="one"></i><i class="m"></i></span><span class="b"></span></div>
       <div class="mini" id="mini"><canvas></canvas><div class="mr"></div></div>
     </div>
     <aside class="reader" id="reader" aria-label="Article reader" aria-hidden="true">
@@ -224,7 +235,7 @@ function preparedTitle(p,font){ p.prep=p.prep||{}; const key=font+'|full-title';
 function naturalTitleWidth(p,font){ const prep=preparedTitle(p,font); if(prep&&PT?.measureNaturalWidth) return PT.measureNaturalWidth(prep); return textW(p.title,font)+SUPW; }
 const sOf=L=>LV[L].pitch/LV[0].pitch; const TOP=LV.length-1; const HDR=26; const REV=true; // newest at the left
 const Z={L:0,k:1,tx:0,ty:0,U:100,lay:[],kTarget:1,ax:0,ay:0,zoomAnim:0,vw:0,vh:0,canvasW:0,canvasH:0,el:{},pool:[],lastX:null,lastY:null,snapT:0,settleT:0,settling:false,focusMaxY:0,focusMinY:null};
-const vp=document.getElementById('vp'), world=document.getElementById('world'), ribbons=document.getElementById('ribbons'), axis=document.getElementById('axis'), vlines=document.getElementById('vlines'), labels=document.getElementById('labels'), zui=document.getElementById('zui'), tip=document.getElementById('tip');
+const vp=document.getElementById('vp'); let world=document.getElementById('world'), ribbons=document.getElementById('ribbons'); const axis=document.getElementById('axis'), vlines=document.getElementById('vlines'), labels=document.getElementById('labels'), zui=document.getElementById('zui'), tip=document.getElementById('tip');
 const mini=document.getElementById('mini'), miniC=mini.querySelector('canvas'), miniR=mini.querySelector('.mr');
 const reader=document.getElementById('reader'), readerFrame=document.getElementById('reader-frame');
 let readerLoadStarted=0, readerLoadTimer=0, revealAnim=0;
@@ -359,11 +370,15 @@ const SWITCH_MS=360, SWITCH_EASE='cubic-bezier(.22,.61,.36,1)';
 function goLevel(L2,ax,ay,centerVertical=false,focusPost=null,allowEdgePadding=false){ L2=clamp(L2,0,TOP); if(ax==null){ax=Z.vw/2;ay=Z.vh/2;} const L1=Z.L; if(L2===L1&&Math.abs(Z.k-1)<1e-6) return;
   const vr=vp.getBoundingClientRect(), oldRects=new Map(), otx=Z.tx, oty=Z.ty, ok=Z.k, zoomIn=L2>L1;
   for(const [i,el] of Object.entries(Z.el)){ const r=el.getBoundingClientRect(); if(r.right>=vr.left-40&&r.left<=vr.right+40&&r.bottom>=vr.top-40&&r.top<=vr.bottom+40) oldRects.set(+i,r); }
-  let ghost=null, ghostTiles=null;
-  if(!reduced){ killSettle(); ghost=document.createElement('div'); ghost.className='ghost'; const gr=ribbons.cloneNode(true), gw=world.cloneNode(true); gr.removeAttribute('id'); gw.removeAttribute('id'); gr.style.transform=gw.style.transform=''; ghost.append(gr,gw); ghost.style.transform=world.style.transform;
+  // The outgoing layers become the ghost exactly as they are, already rasterized, and the incoming
+  // level gets fresh layers. Cloning them instead forced the browser to rasterize a second copy of
+  // the cards and the blurred ribbons before it could show a frame, which read as a stall.
+  let ghosts=null, oldTiles=null; hideGauge();
+  if(!reduced){ killSettle(); const ow=world, orb=ribbons; ow.classList.add('ghost'); orb.classList.add('ghost'); ow.style.willChange=orb.style.willChange='';
+    const nw=document.createElement('div'); nw.className='world'; const nrb=document.createElementNS('http://www.w3.org/2000/svg','svg'); nrb.setAttribute('class','bounds');
     // Zooming in, the ghost sits under the incoming cards; zooming out, the collapsing cards sit over the dots.
-    if(zoomIn) vp.insertBefore(ghost,ribbons); else vp.insertBefore(ghost,vp.querySelector('.pan-edge'));
-    ghostTiles=new Map(); gw.querySelectorAll('.tile').forEach(t=>ghostTiles.set(t.dataset.i,t)); }
+    if(zoomIn) ow.after(nrb,nw); else orb.before(nrb,nw);
+    world=nw; ribbons=nrb; ghosts=[ow,orb]; oldTiles=Z.el; Z.el={}; Z.rasterK=1; }
   const a=worldToAbs((ax-Z.tx)/Z.k,(ay-Z.ty)/Z.k,L1); Z.L=L2; Z.k=1; Z.kTarget=1; const [nx,mappedY]=absToWorld(a,L2), ny=focusPost?tilePos(focusPost,L2)[1]+focusPost.h[L2]/2:mappedY; Z.tx=ax-nx; Z.ty=(centerVertical?Z.vh/2:ay)-ny;
   // Anchored at the pointer, the focused tile lands where the gesture happened; it is only nudged if that would clip it.
   if(focusPost&&!centerVertical){ const top=Z.ty+tilePos(focusPost,L2)[1], bot=top+focusPost.h[L2], m=HDR+8; if(top<m) Z.ty+=m-top; else if(bot>Z.vh-m) Z.ty-=bot-(Z.vh-m); }
@@ -377,14 +392,17 @@ function goLevel(L2,ax,ay,centerVertical=false,focusPost=null,allowEdgePadding=f
       const s0=zoomIn?0.18:clamp(Math.sqrt(or.width*or.height/(nw*nh))*0.3,1.5,4);
       el.getAnimations().forEach(anim=>anim.cancel());
       el.animate([{transform:`translate(${(x+dcx+nw*(1-s0)/2).toFixed(1)}px,${(y+dcy+nh*(1-s0)/2).toFixed(1)}px) scale(${s0})`},{transform:`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`}],{duration,easing:ease,fill:'none'});
-      if(zoomIn&&ghostTiles){ const gt=ghostTiles.get(String(i)); if(gt) gt.style.visibility='hidden'; } }
+      if(zoomIn&&oldTiles&&oldTiles[i]) oldTiles[i].style.visibility='hidden'; }
     world.animate([{opacity:0},{opacity:1}],{duration:duration*.7,easing:'ease-out'});
     ribbons.animate([{opacity:0},{opacity:1}],{duration,easing:'ease-out'});
-    if(ghost){ const gs=zoomIn?2.2:0.6; ghost.animate([{transform:`translate(${otx}px,${oty}px) scale(${ok})`,opacity:1},{transform:`translate(${ax-(ax-otx)*gs}px,${ay-(ay-oty)*gs}px) scale(${ok*gs})`,opacity:0}],{duration,easing:ease,fill:'forwards'}).onfinish=()=>ghost.remove(); }
+    if(ghosts){ const gs=zoomIn?2.2:0.6, frames=[{transform:`translate(${otx}px,${oty}px) scale(${ok})`,opacity:1},{transform:`translate(${ax-(ax-otx)*gs}px,${ay-(ay-oty)*gs}px) scale(${ok*gs})`,opacity:0}];
+      for(const g of ghosts) g.animate(frames,{duration,easing:ease,fill:'forwards'}).onfinish=()=>recycleGhost(g); }
     Z.settling=true; clearTimeout(Z.settleT); Z.settleT=setTimeout(()=>{ Z.settling=false; sync(); setMoving(false); },duration+20);
   } else setMoving(false);
   updateLevelUI(); writeHash(); }
-function killSettle(){ clearTimeout(Z.settleT); vp.querySelectorAll('.ghost').forEach(g=>g.remove()); if(Z.settling){ Z.settling=false; world.getAnimations().forEach(a=>a.cancel()); ribbons.getAnimations().forEach(a=>a.cancel()); document.querySelectorAll('.tile').forEach(e=>{ e.classList.remove('settling'); e.getAnimations().forEach(anim=>anim.cancel()); }); sync(); } }
+// A finished ghost gives its tile nodes back to the pool, so the next level change reuses them.
+function recycleGhost(g){ if(g.classList.contains('world')){ for(const t of g.querySelectorAll('.tile')){ t.getAnimations().forEach(a=>a.cancel()); t.className='tile'; t.dataset.l=''; t.style.visibility=''; if(Z.pool.length<1200) Z.pool.push(t); } } g.remove(); }
+function killSettle(){ clearTimeout(Z.settleT); vp.querySelectorAll('.ghost').forEach(recycleGhost); if(Z.settling){ Z.settling=false; world.getAnimations().forEach(a=>a.cancel()); ribbons.getAnimations().forEach(a=>a.cancel()); document.querySelectorAll('.tile').forEach(e=>{ e.classList.remove('settling'); e.getAnimations().forEach(anim=>anim.cancel()); }); sync(); } }
 // Semantic zoom thresholds: past UP the dots become titles, below DOWN titles become dots.
 // Crossing one mid-gesture switches level at once. Waiting for the gesture to end left the
 // dots swelling to several times their size for half a second before anything happened.
@@ -395,6 +413,20 @@ function crossedLevel(){ return (Z.L===0&&Z.k>=UP)||(Z.L===TOP&&Z.k<=DOWN); }
 // notches are eased. While the scale is in motion nothing mounts or unmounts: the tiles the whole
 // gesture could need are mounted once when it begins, because changing the world's content every
 // frame forced the browser to re-rasterize it under the zoom, which is what made pinching choppy.
+// The zoom gauge shows where the scale sits between the level's native size and the switch to the
+// other level, with the final stretch before the switch marked. A pinch meant only to resize can
+// stop short of it; one meant to switch can see how much is left. Inside that stretch the zoom
+// also gains a detent: the same finger travel moves the scale half as far.
+const zg=document.getElementById('zg'), zgA=zg.querySelector('.a'), zgB=zg.querySelector('.b'), zgZ=zg.querySelector('.z'), zgM=zg.querySelector('.m'), zgOne=zg.querySelector('.one');
+const ARM=1.3, ARM_DOTS=1.2; // the armed stretch spans DOWN..DOWN*ARM at cards and ARM_DOTS..UP at dots
+function inDetent(k,f){ return Z.L===TOP ? (f<1&&k<=DOWN*ARM) : (Z.L===0&&f>1&&k>=ARM_DOTS); }
+function showGauge(){ const top=Z.L===TOP, lo=top?DOWN:1, hi=top?1.5:UP, k=clamp(Z.k,lo,hi), pct=v=>((v-lo)/(hi-lo)*100).toFixed(1)+'%';
+  if(top){ zgA.textContent='dots'; zgA.className='a goal'; zgB.textContent=k.toFixed(2)+'×'; zgB.className='b'; zgZ.style.left='0'; zgZ.style.width=pct(DOWN*ARM); zgOne.style.left=pct(1); zgOne.hidden=false; zg.classList.toggle('armed',k<=DOWN*ARM); }
+  else { zgA.textContent=k.toFixed(2)+'×'; zgA.className='a'; zgB.textContent='titles'; zgB.className='b goal'; zgZ.style.left=pct(ARM_DOTS); zgZ.style.width=((UP-ARM_DOTS)/(hi-lo)*100).toFixed(1)+'%'; zgOne.hidden=true; zg.classList.toggle('armed',k>=ARM_DOTS); }
+  zgM.style.left=pct(k);
+  const x=clamp((Z.ax??Z.vw/2)+16,8,Z.vw-190), y=clamp((Z.ay??Z.vh/2)+40+20,44,Z.vh+40-32); zg.style.transform=`translate(${x}px,${y}px)`;
+  zg.classList.add('on'); clearTimeout(Z.zgT); Z.zgT=setTimeout(()=>zg.classList.remove('on'),650); }
+function hideGauge(){ clearTimeout(Z.zgT); zg.classList.remove('on'); }
 // Chrome rasterizes a will-change:transform layer once, at the scale it first sees, and not again while
 // the hint stays. Cards can rest at any scale between the levels, so at rest on a scale the layer was
 // not rasterized for, the hint is dropped and the browser repaints it crisp. The hint returns at the
@@ -405,12 +437,13 @@ function setMoving(on){ if(on){ if(world.style.willChange!=='transform'){ world.
 // so a pinch that has nowhere to go still answers.
 function zoomToward(f,ax,ay,ease=0.22){ if(performance.now()<(Z.zoomLockUntil||0)) return; const lo=Z.L===0?0.9:DOWN*0.96, hi=Z.L===TOP?1.5:sOf(TOP)*UP/sOf(Z.L);
   if(!Z.zoomActive){ Z.zoomActive=true; killSettle(); clearFocusPadding(); setMoving(true); sync(false,0.3*Math.max(Z.vw,Z.vh)/Z.k+160); }
-  Z.springing=false; Z.kTarget=clamp((Z.kTarget||Z.k)*f,lo,hi); Z.ax=ax; Z.ay=ay; Z.zoomEase=reduced?1:ease; if(!Z.zoomAnim) Z.zoomAnim=requestAnimationFrame(zoomStep); }
+  const k0=Z.kTarget||Z.k; if(inDetent(k0,f)) f=Math.pow(f,0.5);
+  Z.springing=false; Z.kTarget=clamp(k0*f,lo,hi); Z.ax=ax; Z.ay=ay; Z.zoomEase=reduced?1:ease; showGauge(); if(!Z.zoomAnim) Z.zoomAnim=requestAnimationFrame(zoomStep); }
 function applyScale(k){ const wx=(Z.ax-Z.tx)/Z.k, wy=(Z.ay-Z.ty)/Z.k; Z.k=k; Z.tx=Z.ax-wx*Z.k; Z.ty=Z.ay-wy*Z.k; clampPan(); applyCamera(); }
 function zoomStep(){ Z.zoomAnim=0; const d=Z.kTarget-Z.k;
   // The gesture stays active until the snap timer fires, so a pause between pinch events does not resync the tiles.
   if(Math.abs(d)<0.0015){ if(Z.k!==Z.kTarget) applyScale(Z.kTarget); if(Z.zoomActive) return; sync(); setMoving(false); if(Z.springing){ Z.springing=false; writeHash(); } return; }
-  applyScale(Z.k+d*Z.zoomEase);
+  applyScale(Z.k+d*Z.zoomEase); showGauge();
   if(crossedLevel()){ snap(); return; }
   Z.zoomAnim=requestAnimationFrame(zoomStep); }
 function scheduleSnap(){ clearTimeout(Z.snapT); Z.snapT=setTimeout(snap,300); }
@@ -570,9 +603,9 @@ vp.addEventListener('wheel',ev=>{ const [x,y]=rel(ev); Z.lastX=x; Z.lastY=y;
   let dx=ev.deltaX, dy=ev.deltaY; if(ev.shiftKey&&!dx){ dx=dy; dy=0; } if(ev.deltaMode===1){ dx*=16; dy*=16; }
   const tx=Z.tx, ty=Z.ty; Z.tx-=dx; Z.ty-=dy; clampPan(); if(Z.tx===tx&&Z.ty===ty){ return; } killSettle(); setMoving(true); applyCamera(); sync(); },{passive:false});
 // Title tiles already show their title, so the hover card only adds what the tile leaves out.
-world.addEventListener('pointerover',ev=>{ const t=ev.target.closest('.tile'); if(!t) return; const p=posts[+t.dataset.i]; t.classList.add('hit'); tip.hidden=false;
+vp.addEventListener('pointerover',ev=>{ const t=ev.target.closest('.tile'); if(!t) return; const p=posts[+t.dataset.i]; t.classList.add('hit'); tip.hidden=false;
   tip.innerHTML=`<div class="m">#${pad(p.num)} · ${p.date}</div>${Z.L===0?`<div class="t">${esc(p.title)}</div>`:''}<div class="g">${THEMES[p.th]}${p.tags.length?' · '+esc(p.tags.join(', ')):''}</div>`; });
-world.addEventListener('pointermove',ev=>{
+vp.addEventListener('pointermove',ev=>{
   if(tip.hidden) return;
   const tw=tip.offsetWidth, th=tip.offsetHeight, gap=14, margin=8;
   // The open reader is an occluding edge just like the browser window. Prefer
@@ -586,7 +619,7 @@ world.addEventListener('pointermove',ev=>{
   ty=clamp(ty,margin,Math.max(margin,innerHeight-margin-th));
   tip.style.left=tx+'px'; tip.style.top=ty+'px';
 });
-world.addEventListener('pointerout',ev=>{ const t=ev.target.closest('.tile'); if(!t) return; t.classList.remove('hit'); tip.hidden=true; });
+vp.addEventListener('pointerout',ev=>{ const t=ev.target.closest('.tile'); if(!t) return; t.classList.remove('hit'); tip.hidden=true; });
 zui.addEventListener('keydown',ev=>{ const k=ev.key; if(k==='+'||k==='='){ goLevel(Z.L+1); } else if(k==='-'||k==='_'){ goLevel(Z.L-1); } else if(k==='0'){ resetView(); } else if(k==='ArrowLeft'){ Z.tx+=80; } else if(k==='ArrowRight'){ Z.tx-=80; } else if(k==='ArrowUp'){ Z.ty+=80; } else if(k==='ArrowDown'){ Z.ty-=80; } else return; ev.preventDefault(); setMoving(true); clampPan(); applyCamera(); sync(); });
 mini.addEventListener('pointerdown',ev=>{ ev.stopPropagation(); const r=mini.getBoundingClientRect(); const go=e=>{ const g=laneGeom(Z.L); const wx=(e.clientX-r.left)/r.width*g.W, wy=(e.clientY-r.top)/r.height*g.H; Z.tx=Z.vw/2-wx*Z.k; Z.ty=Z.vh/2-wy*Z.k; clampPan(); applyCamera(); sync(); }; go(ev); const mv=e=>go(e); const up=()=>{ window.removeEventListener('pointermove',mv); window.removeEventListener('pointerup',up); }; window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up); });
 function resetView(){ Z.L=0; Z.k=1; Z.tx=0; Z.ty=0; Z.focusMaxY=0; Z.focusMinY=null; layoutWorld(); clampPan(); applyCamera(); sync(true); updateLevelUI(); writeHash(); }
