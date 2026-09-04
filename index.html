@@ -122,7 +122,7 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);o
 .tile.dim{opacity:.10}
 .tile.hit:not(.open){outline:1px solid color-mix(in oklab,var(--c) 75%,var(--ink-3));outline-offset:1px;background:color-mix(in oklab,var(--c) 16%,var(--panel));box-shadow:0 2px 7px var(--shadow);z-index:3}
 .tile.open{outline:2px solid var(--accent-strong);outline-offset:2px;box-shadow:0 0 0 1px var(--c);z-index:4}
-.tile.l0{background:var(--c);border:0;padding:0;border-radius:1.5px;cursor:zoom-in}
+.tile.l0{background:var(--c);border:0;padding:0;border-radius:1.5px}
 .tile.l0.hit{background:var(--c);outline:2px solid color-mix(in oklab,var(--accent) 72%,white);outline-offset:2px;box-shadow:0 0 0 1px color-mix(in oklab,var(--c) 65%,var(--ink));z-index:3}
 .tile sup{font:500 9px/1 "IBM Plex Mono",monospace;color:var(--ink-3);vertical-align:top;position:relative;top:1px;margin-left:4px;letter-spacing:.02em}
 .tile.l1{padding:5px 7px 5px 6px;align-items:flex-start}
@@ -509,7 +509,8 @@ function renderMini(){ const W=Z.miniW,H=Z.miniH; if(!W) return; const L=Z.L, g=
 const ptrs=new Map(); let drag=null, moved=false, vx=0, vy=0, inertia=0, pinchD=0;
 function rel(ev){ const r=vp.getBoundingClientRect(); return [ev.clientX-r.left, ev.clientY-r.top]; }
 function tileAt(x,y){ for(const el of Object.values(Z.el)){ const r=el.getBoundingClientRect(); if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom) return el; } return null; }
-function activateTile(el,x,y){ const p=posts[+el.dataset.i]; if(Z.L===0) goLevel(1,x,y,true,p,true); else openReader(p); }
+// A click opens the post at either level; the pinch and the View control are what change level.
+function activateTile(el){ openReader(posts[+el.dataset.i]); }
 vp.addEventListener('pointerdown',ev=>{ if(ev.button!==0&&ev.pointerType==='mouse') return; vp.setPointerCapture(ev.pointerId); const [x,y]=rel(ev); ptrs.set(ev.pointerId,[x,y]); cancelAnimationFrame(inertia); clearTimeout(Z.snapT); killSettle(); setMoving(true); tip.hidden=true;
   if(ptrs.size===1){ drag={x,y,t:performance.now()}; moved=false; vx=vy=0; } else if(ptrs.size===2){ clearFocusPadding(); drag=null; const [a,b]=[...ptrs.values()]; pinchD=Math.hypot(a[0]-b[0],a[1]-b[1]); } });
 vp.addEventListener('pointermove',ev=>{ const [x,y]=rel(ev); Z.lastX=x; Z.lastY=y; if(!ptrs.has(ev.pointerId)){ return; } ptrs.set(ev.pointerId,[x,y]);
@@ -520,7 +521,7 @@ function endPtr(ev){ if(!ptrs.has(ev.pointerId)) return; ptrs.delete(ev.pointerI
   if(ptrs.size===0){ if(Math.abs(Z.k-1)>1e-6){ scheduleSnap(); } else if(moved&&!reduced){ const step=()=>{ vx*=0.92; vy*=0.92; if(Math.abs(vx)<0.3&&Math.abs(vy)<0.3) return; Z.tx+=vx; Z.ty+=vy; clampPan(); applyCamera(); sync(); inertia=requestAnimationFrame(step); }; inertia=requestAnimationFrame(step); } drag=null; } }
 function snapAfterPinch(){ if(Math.abs(Z.k-1)>1e-6) scheduleSnap(); }
 vp.addEventListener('pointerup',endPtr); vp.addEventListener('pointercancel',endPtr);
-vp.addEventListener('click',ev=>{ if(moved){ moved=false; return; } const el=tileAt(ev.clientX,ev.clientY); if(el){ const [x,y]=rel(ev); activateTile(el,x,y); } });
+vp.addEventListener('click',ev=>{ if(moved){ moved=false; return; } const el=tileAt(ev.clientX,ev.clientY); if(el) activateTile(el); });
 function openReader(p){
   // Opening the fixed reader changes the usable hover area before another
   // pointermove necessarily occurs. Remove the transient hover card instead of
@@ -617,7 +618,7 @@ function applyFilters(){
 }
 // With no filter active the hint teaches the gestures, which nothing else on screen does.
 const hintEl=document.getElementById('hint');
-const NAV_HINT=['drag to pan · ctrl-scroll or pinch to zoom · click a dot for titles','drag to pan · click a title to read it · ctrl-scroll or pinch to zoom out'];
+const NAV_HINT=['drag to pan · pinch or ctrl-scroll for titles · click a dot to read it','drag to pan · click a title to read it · pinch or ctrl-scroll to zoom'];
 function updateHint(){ hintEl.textContent=Z.filterHint||NAV_HINT[Z.L]; }
 function setIso(d){ iso=d; [...legend.children].forEach((c,i)=>c.setAttribute('aria-pressed',String(i===d))); applyFilters(); }
 function setTag(t){ activeTag=t; [...tagList.children].forEach(c=>c.setAttribute('aria-pressed',String(c.firstChild?.textContent===t))); applyFilters(); }
