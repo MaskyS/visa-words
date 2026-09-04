@@ -105,8 +105,8 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);o
 .world.settling{transition:transform .3s cubic-bezier(.22,.61,.36,1)}
 .bounds{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
 .bounds path{fill-opacity:.047;stroke:none}
-/* Title cards cover most of their ribbon, so the margins that remain carry a little more tint. */
-.zui.titles .bounds path{fill-opacity:.07}
+/* Title cards cover most of their ribbon, so the margins that remain carry a touch more tint than the dot rows. */
+.zui.titles .bounds path{fill-opacity:.05}
 .tile{position:absolute;left:0;top:0;transform-origin:0 0;border-radius:3px;overflow:hidden;cursor:pointer;color:var(--ink);font-family:"IBM Plex Sans",sans-serif;line-height:1.25;
   background:color-mix(in oklab,var(--c) 11%,var(--panel));border-left:3px solid var(--c);padding:0 6px;display:flex;align-items:center;gap:4px;transition:opacity .25s,background .16s ease,box-shadow .16s ease,outline-color .16s ease}
 .tile.settling{transition:transform .3s cubic-bezier(.22,.61,.36,1),width .3s cubic-bezier(.22,.61,.36,1),height .3s cubic-bezier(.22,.61,.36,1),opacity .24s}
