@@ -104,9 +104,13 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);o
 .world{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
 .world.settling{transition:transform .3s cubic-bezier(.22,.61,.36,1)}
 .bounds{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
-.bounds path{fill-opacity:.047;stroke:none}
-/* Title cards cover most of their ribbon, so the margins that remain carry a touch more tint than the dot rows. */
-.zui.titles .bounds path{fill-opacity:.05}
+.bounds path{fill-opacity:.055;stroke:none}
+/* Feathered lane boundaries. The blur is applied in world space, inside the transformed layer, so it
+   scales with a pinch instead of fighting it, and it is rendered once per level change. A softened
+   edge reads lighter than a hard one, so each level's fill is set alongside its radius. */
+.bounds{filter:blur(12px)}
+.zui.titles .bounds{filter:blur(22px)}
+.zui.titles .bounds path{fill-opacity:.08}
 .tile{position:absolute;left:0;top:0;transform-origin:0 0;border-radius:3px;overflow:hidden;cursor:pointer;color:var(--ink);font-family:"IBM Plex Sans",sans-serif;line-height:1.25;
   background:color-mix(in oklab,var(--c) 11%,var(--panel));border-left:3px solid var(--c);padding:0 6px;display:flex;align-items:center;gap:4px;transition:opacity .25s,background .16s ease,box-shadow .16s ease,outline-color .16s ease}
 .tile.settling{transition:transform .3s cubic-bezier(.22,.61,.36,1),width .3s cubic-bezier(.22,.61,.36,1),height .3s cubic-bezier(.22,.61,.36,1),opacity .24s}
@@ -304,7 +308,9 @@ function layoutWorld(){ const g=laneGeom(Z.L); Z.canvasW=g.W; Z.canvasH=g.H; wor
 // A lane's tint is the region between two envelopes. Samples sit at column
 // centres and are joined by quadratic curves through their midpoints, which
 // never overshoot the sampled values, so the tint stays clear of the cards.
-function envelopePts(F,g){ const last=clamp(Math.floor(g.W/g.grid),0,g.C-1), pts=[[0,F[0]]]; for(let c=0;c<=last;c++){ const x=(c+.5)*g.grid; if(x>=g.W) break; pts.push([x,F[c]]); } pts.push([g.W,F[last]]); return pts; }
+// Ribbons overrun the world by the blur radius on both ends so the feathering cannot fade them at the edges.
+const OVERRUN=60;
+function envelopePts(F,g){ const last=clamp(Math.floor(g.W/g.grid),0,g.C-1), pts=[[-OVERRUN,F[0]]]; for(let c=0;c<=last;c++){ const x=(c+.5)*g.grid; if(x>=g.W) break; pts.push([x,F[c]]); } pts.push([g.W+OVERRUN,F[last]]); return pts; }
 function curveD(pts){ const f=v=>v.toFixed(1); let d=`L${f(pts[0][0])} ${f(pts[0][1])}`; for(let i=1;i<pts.length-1;i++){ const [x,y]=pts[i], [x1,y1]=pts[i+1]; d+=`Q${f(x)} ${f(y)} ${f((x+x1)/2)} ${f((y+y1)/2)}`; } const e=pts[pts.length-1]; return d+`L${f(e[0])} ${f(e[1])}`; }
 function ribbonD(d,g){ const top=envelopePts(g.bounds[d],g), bot=envelopePts(g.bounds[d+1],g).reverse(); return 'M'+curveD(top).slice(1)+curveD(bot)+'Z'; }
 function readerOcclusionInset(){
