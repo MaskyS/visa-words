@@ -65,14 +65,15 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);o
 /* ---------- ZUI ---------- */
 .workspace{position:relative;display:flex;flex:1;min-width:0;min-height:0}
 .zui{position:relative;flex:1;min-width:0;height:100%;min-height:0;border:1px solid var(--rule);border-radius:8px 8px 0 0;overflow:hidden;background:var(--panel);user-select:none;-webkit-user-select:none;--A:40px}
-.corner{position:absolute;left:0;top:0;height:var(--A);min-width:48px;display:flex;align-items:flex-start;padding:5px 10px 0 8px;background:linear-gradient(90deg,var(--panel) 78%,transparent);font:600 11px/1 "IBM Plex Mono",monospace;color:var(--ink-2);z-index:4;pointer-events:none}
+/* Two-row time header: years above a hairline, the finer unit below it. */
 .axis{position:absolute;left:0;top:0;right:0;height:var(--A);overflow:hidden;border-bottom:1px solid var(--rule);z-index:3;background:var(--panel)}
+.axis::after{content:"";position:absolute;left:0;right:0;top:22px;border-top:1px solid var(--rule-2);pointer-events:none}
 .axis .tk{position:absolute;top:0;height:100%;border-left:1px solid var(--rule)}
-.axis .tk span{position:absolute;left:5px;top:5px;font:500 11px/1 "IBM Plex Mono",monospace;color:var(--ink-2);white-space:nowrap}
-.axis .tk.minor{border-left-color:var(--rule-2)}
+.axis .tk.minor{top:23px;height:17px;border-left-color:var(--rule)}
+.axis .tk span{position:absolute;left:5px;top:26px;font:500 10.5px/1 "IBM Plex Mono",monospace;color:var(--ink-2);white-space:nowrap;letter-spacing:.01em}
+.axis .tk.minor span{top:3px;color:var(--ink-3);font-weight:400}
 .axis .tk.left span{left:auto;right:5px}
-.axis .tk.minor span{color:var(--ink-3);font-weight:400}
-.axis .yr{position:absolute;bottom:4px;font:500 10px/1 "IBM Plex Mono",monospace;color:var(--ink-3);white-space:nowrap;padding-left:4px;border-left:2px solid var(--ink-3);height:12px;line-height:12px}
+.axis .yr{position:absolute;top:6px;padding:0 4px;font:600 11px/1 "IBM Plex Mono",monospace;color:var(--ink);letter-spacing:.03em;white-space:nowrap}
 .labels{position:absolute;left:0;top:var(--A);right:0;bottom:0;overflow:hidden;z-index:2;pointer-events:none}
 .pill{position:absolute;left:0;top:0;display:inline-flex;align-items:center;gap:7px;height:22px;padding:0 6px 0 2px;font:500 11px/1 "IBM Plex Sans",sans-serif;letter-spacing:.035em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap;pointer-events:none}
 .pill i{width:8px;height:8px;border-radius:50%;background:var(--c);flex:none}
@@ -170,7 +171,6 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);o
   <div class="workspace">
     <div class="zui" id="zui" tabindex="0" aria-label="Zoomable lanes of word vomits">
       <div class="axis" id="axis"></div>
-      <div class="corner" id="sticky-year" aria-hidden="true"></div>
       <div class="viewport" id="vp"><div class="vlines" id="vlines"></div><svg class="bounds" id="ribbons"></svg><div class="world" id="world"></div><i class="pan-edge left"></i><i class="pan-edge right"></i></div>
       <div class="labels" id="labels"></div>
       <div class="mini" id="mini"><canvas></canvas><div class="mr"></div></div>
@@ -224,7 +224,7 @@ function preparedTitle(p,font){ p.prep=p.prep||{}; const key=font+'|full-title';
 function naturalTitleWidth(p,font){ const prep=preparedTitle(p,font); if(prep&&PT?.measureNaturalWidth) return PT.measureNaturalWidth(prep); return textW(p.title,font)+SUPW; }
 const sOf=L=>LV[L].pitch/LV[0].pitch; const TOP=LV.length-1; const HDR=26; const REV=true; // newest at the left
 const Z={L:0,k:1,tx:0,ty:0,U:100,lay:[],kTarget:1,ax:0,ay:0,zoomAnim:0,vw:0,vh:0,canvasW:0,canvasH:0,el:{},pool:[],lastX:null,lastY:null,snapT:0,settleT:0,settling:false,focusMaxY:0,focusMinY:null};
-const vp=document.getElementById('vp'), world=document.getElementById('world'), ribbons=document.getElementById('ribbons'), axis=document.getElementById('axis'), stickyYear=document.getElementById('sticky-year'), vlines=document.getElementById('vlines'), labels=document.getElementById('labels'), zui=document.getElementById('zui'), tip=document.getElementById('tip');
+const vp=document.getElementById('vp'), world=document.getElementById('world'), ribbons=document.getElementById('ribbons'), axis=document.getElementById('axis'), vlines=document.getElementById('vlines'), labels=document.getElementById('labels'), zui=document.getElementById('zui'), tip=document.getElementById('tip');
 const mini=document.getElementById('mini'), miniC=mini.querySelector('canvas'), miniR=mini.querySelector('.mr');
 const reader=document.getElementById('reader'), readerFrame=document.getElementById('reader-frame');
 let readerLoadStarted=0, readerLoadTimer=0, revealAnim=0;
@@ -232,7 +232,7 @@ let readerLoadStarted=0, readerLoadTimer=0, revealAnim=0;
 // ---------- layout ----------
 function computeUnits(){ Z.vw=vp.clientWidth; Z.vh=vp.clientHeight; Z.U=Math.max(20, Z.vw/LV[0].pitch);
   // Fixed-size chrome is measured here rather than every frame, so per-frame rendering never forces a layout.
-  Z.cornerW=stickyYear.offsetWidth||48; Z.miniW=mini.clientWidth; Z.miniH=mini.clientHeight;
+  Z.yearW=Math.ceil(textW('2026','600 11px "IBM Plex Mono", monospace'))+8; Z.miniW=mini.clientWidth; Z.miniH=mini.clientHeight;
   const tOf=p=>mode==='index'?p.tIndex:p.tDate; posts.forEach(p=>{ const t=tOf(p); p.u=(REV?1-t:t)*(Z.U-1); p.pos=p.pos||[]; p.w=p.w||[]; p.h=p.h||[]; }); Z.marks=null;
   Z.lay=LV.map((lv,L)=>layoutLevel(L)); }
 // Each lane is packed on top of the bottom envelope of the lane above, column by column, so lanes hug their content.
@@ -381,28 +381,35 @@ function goLevel(L2,ax,ay,centerVertical=false,focusPost=null,allowEdgePadding=f
     world.animate([{opacity:0},{opacity:1}],{duration:duration*.7,easing:'ease-out'});
     ribbons.animate([{opacity:0},{opacity:1}],{duration,easing:'ease-out'});
     if(ghost){ const gs=zoomIn?2.2:0.6; ghost.animate([{transform:`translate(${otx}px,${oty}px) scale(${ok})`,opacity:1},{transform:`translate(${ax-(ax-otx)*gs}px,${ay-(ay-oty)*gs}px) scale(${ok*gs})`,opacity:0}],{duration,easing:ease,fill:'forwards'}).onfinish=()=>ghost.remove(); }
-    Z.settling=true; clearTimeout(Z.settleT); Z.settleT=setTimeout(()=>{ Z.settling=false; sync(); },duration+20);
-  }
+    Z.settling=true; clearTimeout(Z.settleT); Z.settleT=setTimeout(()=>{ Z.settling=false; sync(); setMoving(false); },duration+20);
+  } else setMoving(false);
   updateLevelUI(); writeHash(); }
 function killSettle(){ clearTimeout(Z.settleT); vp.querySelectorAll('.ghost').forEach(g=>g.remove()); if(Z.settling){ Z.settling=false; world.getAnimations().forEach(a=>a.cancel()); ribbons.getAnimations().forEach(a=>a.cancel()); document.querySelectorAll('.tile').forEach(e=>{ e.classList.remove('settling'); e.getAnimations().forEach(anim=>anim.cancel()); }); sync(); } }
 // Semantic zoom thresholds: past UP the dots become titles, below DOWN titles become dots.
 // Crossing one mid-gesture switches level at once. Waiting for the gesture to end left the
 // dots swelling to several times their size for half a second before anything happened.
-const UP=1.35, DOWN=0.78;
+const UP=1.35, DOWN=0.5;
 function crossedLevel(){ return (Z.L===0&&Z.k>=UP)||(Z.L===TOP&&Z.k<=DOWN); }
 // Zoom input only moves the target scale; one frame callback applies it, so a burst of wheel
 // events costs one camera update. Trackpad pinches track the fingers 1:1 (ease 1); mouse wheel
 // notches are eased. While the scale is in motion nothing mounts or unmounts: the tiles the whole
 // gesture could need are mounted once when it begins, because changing the world's content every
 // frame forced the browser to re-rasterize it under the zoom, which is what made pinching choppy.
-// Beyond the outermost levels the scale gives a little and springs back, so a pinch that has nowhere to go still answers.
-function zoomToward(f,ax,ay,ease=0.22){ if(performance.now()<(Z.zoomLockUntil||0)) return; const lo=Z.L===0?0.9:1/sOf(Z.L), hi=Z.L===TOP?1.12:sOf(TOP)*UP/sOf(Z.L);
-  if(!Z.zoomActive){ Z.zoomActive=true; killSettle(); clearFocusPadding(); sync(false,0.3*Math.max(Z.vw,Z.vh)/Z.k+160); }
+// Chrome rasterizes a will-change:transform layer once, at the scale it first sees, and not again while
+// the hint stays. Cards can rest at any scale between the levels, so at rest on a scale the layer was
+// not rasterized for, the hint is dropped and the browser repaints it crisp. The hint returns at the
+// start of the next gesture, before its first frame of motion.
+function setMoving(on){ if(on){ if(world.style.willChange!=='transform'){ world.style.willChange=ribbons.style.willChange='transform'; Z.rasterK=Z.k; } }
+  else if(Math.abs((Z.rasterK??1)-Z.k)>0.005&&world.style.willChange!=='auto'){ world.style.willChange=ribbons.style.willChange='auto'; } }
+// Cards scale freely between half size and 1.5x. Dots give a little beyond their level and spring back,
+// so a pinch that has nowhere to go still answers.
+function zoomToward(f,ax,ay,ease=0.22){ if(performance.now()<(Z.zoomLockUntil||0)) return; const lo=Z.L===0?0.9:DOWN*0.96, hi=Z.L===TOP?1.5:sOf(TOP)*UP/sOf(Z.L);
+  if(!Z.zoomActive){ Z.zoomActive=true; killSettle(); clearFocusPadding(); setMoving(true); sync(false,0.3*Math.max(Z.vw,Z.vh)/Z.k+160); }
   Z.springing=false; Z.kTarget=clamp((Z.kTarget||Z.k)*f,lo,hi); Z.ax=ax; Z.ay=ay; Z.zoomEase=reduced?1:ease; if(!Z.zoomAnim) Z.zoomAnim=requestAnimationFrame(zoomStep); }
 function applyScale(k){ const wx=(Z.ax-Z.tx)/Z.k, wy=(Z.ay-Z.ty)/Z.k; Z.k=k; Z.tx=Z.ax-wx*Z.k; Z.ty=Z.ay-wy*Z.k; clampPan(); applyCamera(); }
 function zoomStep(){ Z.zoomAnim=0; const d=Z.kTarget-Z.k;
   // The gesture stays active until the snap timer fires, so a pause between pinch events does not resync the tiles.
-  if(Math.abs(d)<0.0015){ if(Z.k!==Z.kTarget) applyScale(Z.kTarget); if(Z.zoomActive) return; sync(); if(Z.springing){ Z.springing=false; writeHash(); } return; }
+  if(Math.abs(d)<0.0015){ if(Z.k!==Z.kTarget) applyScale(Z.kTarget); if(Z.zoomActive) return; sync(); setMoving(false); if(Z.springing){ Z.springing=false; writeHash(); } return; }
   applyScale(Z.k+d*Z.zoomEase);
   if(crossedLevel()){ snap(); return; }
   Z.zoomAnim=requestAnimationFrame(zoomStep); }
@@ -414,38 +421,45 @@ function snap(){ cancelAnimationFrame(Z.zoomAnim); Z.zoomAnim=0; clearTimeout(Z.
     // The switch is the gesture's outcome. Trailing pinch deltas are dropped for a beat so they
     // neither cut the settle animation short nor inflate the new level past its native scale.
     Z.zoomLockUntil=performance.now()+SWITCH_MS+90; const x=Z.lastX??Z.vw/2,y=Z.lastY??Z.vh/2; goLevel(target,x,y,false,nearestTileAt(x,y)); return; }
-  // Between levels there is nothing sharper to show, and the browser never re-rasterizes the
-  // scaled layer, so a gesture that stops short springs back to the level's native scale.
-  if(Math.abs(Z.k-1)>1e-6){ Z.kTarget=1; Z.zoomEase=reduced?1:0.3; Z.ax=Z.lastX??Z.vw/2; Z.ay=Z.lastY??Z.vh/2; Z.springing=true; Z.zoomAnim=requestAnimationFrame(zoomStep); }
-  else { sync(); writeHash(); } }
+  // Cards stay at whatever scale the gesture left them. Dots have nothing to show between
+  // scales, so they spring back to their native size.
+  if(Z.L!==TOP&&Math.abs(Z.k-1)>1e-6){ Z.kTarget=1; Z.zoomEase=reduced?1:0.3; Z.ax=Z.lastX??Z.vw/2; Z.ay=Z.lastY??Z.vh/2; Z.springing=true; Z.zoomAnim=requestAnimationFrame(zoomStep); }
+  else { sync(); setMoving(false); writeHash(); } }
 function updateLevelUI(){ [...document.getElementById('levels').children].forEach((b,i)=>b.setAttribute('aria-pressed',String(i===Z.L))); zui.classList.toggle('titles',Z.L===1); updateHint(); }
 
 // ---------- furniture ----------
+const MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+// The header has two rows. Years run along the top, each spanning its range and holding to the left
+// edge for as long as its range covers it, which is what the old sticky corner did for one year at a
+// time. The finer unit sits beneath, labelled at its boundary. Only the coarser boundaries draw a
+// full-height rule and a grid line; finer marks are short ticks in the bottom row.
 function renderAxis(){ const e=Z.k*LV[Z.L].pitch; axis.innerHTML=''; vlines.innerHTML=''; const frag=document.createDocumentFragment(), vf=document.createDocumentFragment(); const u0=(-Z.tx)/e, u1=(-Z.tx+Z.vw)/e;
-  const leftU=clamp(u0,0,Z.U-1), leftT=REV?1-leftU/(Z.U-1):leftU/(Z.U-1);
-  stickyYear.textContent=mode==='date'?String(new Date(T0+leftT*(T1-T0)).getUTCFullYear()):String(posts[clamp(Math.round(leftT*(N-1)),0,N-1)].year);
-  // The sticky year sits over the left end of the axis; a tick label under it would collide.
-  const cornerW=Z.cornerW;
-  const mk=(u,label,cls='')=>{ const x=Z.tx+u*e; if(x<-60||x>Z.vw+60) return; if(label&&x<(cls.includes('left')?cornerW+40:cornerW+4)) label=''; const d=document.createElement('div'); d.className='tk'+(cls?' '+cls:''); d.style.left=x+'px'; if(label){ const s=document.createElement('span'); s.textContent=label; d.appendChild(s);} frag.appendChild(d); const l=document.createElement('div'); l.className=cls.includes('minor')?'':'major'; l.style.left=x+'px'; vf.appendChild(l); };
+  const xOf=u=>Z.tx+u*e;
+  const mk=(u,label,cls='')=>{ const x=xOf(u); if(x<-60||x>Z.vw+60) return; const minor=cls.includes('minor'); const d=document.createElement('div'); d.className='tk'+(cls?' '+cls:''); d.style.left=x+'px'; if(label){ const s=document.createElement('span'); s.textContent=label; d.appendChild(s);} frag.appendChild(d);
+    if(label||!minor){ const l=document.createElement('div'); l.className=minor?'':'major'; l.style.left=x+'px'; vf.appendChild(l); } };
+  const yearLabel=(year,xa,xb)=>{ const x0=Math.min(xa,xb), x1=Math.max(xa,xb), w=Z.yearW; if(x1<6||x0>Z.vw||x1-x0<w+12) return; const x=clamp(x0+6,6,x1-w-6); if(x>Z.vw-w) return; const d=document.createElement('div'); d.className='yr'; d.style.left=x+'px'; d.textContent=year; frag.appendChild(d); };
   if(mode==='index'){ // year and month boundaries located at the first post of each year / month
     if(!Z.marks){ Z.marks=[]; let pm=''; for(const p of [...posts].sort((a,b)=>a.u-b.u)){ const ym=p.date.slice(0,7); if(ym!==pm){ Z.marks.push({p,ym,year:pm===''||pm.slice(0,4)!==ym.slice(0,4)}); pm=ym; } } }
-    const pxPerPost=e*(Z.U-1)/(N-1); const showMonths = pxPerPost*12>=60; const MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    // Equal-per-post spacing can place several sparse years only a few pixels
-    // apart. Preserve every boundary, but thin labels according to screen space.
-    // More labels naturally return as the user zooms in.
+    const pxPerPost=e*(Z.U-1)/(N-1), showMonths=pxPerPost*12>=60, years=Z.marks.filter(b=>b.year);
+    // A year's span runs from its newest post to the next older year's newest post; the oldest year runs to the end of the world.
+    for(let i=0;i<years.length;i++){ const last=i+1>=years.length; yearLabel(years[i].ym.slice(0,4),xOf(years[i].p.u),xOf(last?Z.U-1:years[i+1].p.u)+(last?e:0)); }
+    // Equal-per-post spacing can place several sparse months only a few pixels apart. Every boundary
+    // keeps its tick; labels thin to fit the screen, and more return as the user zooms in.
     let lastLabelX=-1e9;
-    for(const b of Z.marks){ if(!b.year&&!showMonths) continue; const x=Z.tx+b.p.u*e; if(x<-60||x>Z.vw+60) continue;
-      const label=b.year?b.ym.slice(0,4):MN[+b.ym.slice(5)-1], minGap=b.year?48:44;
-      if(x-lastLabelX<minGap){ if(b.year) mk(b.p.u,''); continue; }
-      lastLabelX=x; mk(b.p.u,label,b.year?'':'minor'); }
+    for(const b of Z.marks){ if(!b.year&&!showMonths) continue; const x=xOf(b.p.u); if(x<-60||x>Z.vw+60) continue;
+      if(b.year){ mk(b.p.u,''); continue; }
+      if(x-lastLabelX<44){ mk(b.p.u,'','minor'); continue; }
+      lastLabelX=x; mk(b.p.u,MN[+b.ym.slice(5)-1],'minor'); }
   } else { const msPerU=(T1-T0)/(Z.U-1); const timeAtU=u=>T0+(REV?1-u/(Z.U-1):u/(Z.U-1))*(T1-T0), uAtTime=ms=>(REV?1-(ms-T0)/(T1-T0):(ms-T0)/(T1-T0))*(Z.U-1); const pxPerDay=e*86400000/msPerU; const units=[['day',1],['week',7],['month',30.4],['quarter',91],['year',365.25]]; const unit=(units.find(([n,d])=>d*pxPerDay>=76)||units[4])[0];
-    const t0=new Date(Math.min(timeAtU(u0),timeAtU(u1))), t1=new Date(Math.max(timeAtU(u0),timeAtU(u1))); let d=new Date(Date.UTC(t0.getUTCFullYear(),unit==='year'?0:t0.getUTCMonth(),unit==='day'||unit==='week'?t0.getUTCDate():1));
-    if(unit==='quarter') d=new Date(Date.UTC(t0.getUTCFullYear(),Math.floor(t0.getUTCMonth()/3)*3,1));
-    const MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]; let guard=0;
+    const t0=new Date(Math.min(timeAtU(u0),timeAtU(u1))), t1=new Date(Math.max(timeAtU(u0),timeAtU(u1)));
+    for(let y=t0.getUTCFullYear();y<=t1.getUTCFullYear();y++) yearLabel(String(y),xOf(uAtTime(Date.UTC(y,0,1))),xOf(uAtTime(Date.UTC(y+1,0,1))));
+    // At the year unit the bottom row keeps unlabelled quarter ticks, so the ruler never goes blank.
+    const fine=unit==='year'?'quarter':unit, byDay=fine==='day'||fine==='week';
+    let d=new Date(Date.UTC(t0.getUTCFullYear(),fine==='quarter'?Math.floor(t0.getUTCMonth()/3)*3:t0.getUTCMonth(),byDay?t0.getUTCDate():1)), guard=0;
     while(d<=t1&&guard++<400){ const u=uAtTime(d.getTime()); const y=d.getUTCFullYear(), m=d.getUTCMonth(), dd=d.getUTCDate();
-      let label, major; if(unit==='year'){label=String(y);major=true;} else if(unit==='quarter'||unit==='month'){label=m===0?String(y):MN[m];major=m===0;} else {label=dd===1?MN[m]+' '+dd:String(dd);major=dd===1;}
+      let label, major; if(byDay){ label=dd===1?MN[m]+' '+dd:String(dd); major=dd===1; } else { label=unit==='year'?'':MN[m]; major=m===0; }
       mk(u,label,(major?'':'minor')+(REV?' left':''));
-      if(unit==='year') d=new Date(Date.UTC(y+1,0,1)); else if(unit==='quarter') d=new Date(Date.UTC(y,m+3,1)); else if(unit==='month') d=new Date(Date.UTC(y,m+1,1)); else if(unit==='week') d=new Date(d.getTime()+7*86400000); else d=new Date(d.getTime()+86400000); } }
+      if(fine==='quarter') d=new Date(Date.UTC(y,m+3,1)); else if(fine==='month') d=new Date(Date.UTC(y,m+1,1)); else if(fine==='week') d=new Date(d.getTime()+7*86400000); else d=new Date(d.getTime()+86400000); } }
   axis.appendChild(frag); vlines.appendChild(vf); }
 // Sticky copies of the run labels: one fades in at the left edge only while its run's own label has scrolled off to the left, and fades out again when the run ends.
 // Lanes with no part of their ribbon on screen dock at the edge they left through, so the categories beyond the viewport stay named and one click away.
@@ -457,7 +471,7 @@ function buildGutter(){
 // The gutter judges everything at the left edge, where the labels live. A label footprint spans a few columns, so sample the highest boundary under all of them.
 const leftColF=g=>clamp((-Z.tx+8)/Z.k/g.grid,0,g.C-1);
 function labelTopAt(g,d,c){ const span=Math.max(1,Math.ceil(LBW[d]/g.grid)); let y=0; for(let i=c;i<=Math.min(g.C-1,c+span);i++) if(g.bandTops[d][i]>y) y=g.bandTops[d][i]; return y+(HDR-22)/2; }
-function animatePanY(ty){ cancelAnimationFrame(inertia); cancelAnimationFrame(revealAnim); killSettle(); const start=Z.ty, began=performance.now(), duration=reduced?0:320;
+function animatePanY(ty){ cancelAnimationFrame(inertia); cancelAnimationFrame(revealAnim); killSettle(); setMoving(true); const start=Z.ty, began=performance.now(), duration=reduced?0:320;
   const step=now=>{ const t=duration?Math.min(1,(now-began)/duration):1, e=1-Math.pow(1-t,3); Z.ty=start+(ty-start)*e; clampPan(); applyCamera(); sync(); if(t<1) revealAnim=requestAnimationFrame(step); }; revealAnim=requestAnimationFrame(step); }
 // Bring the lane's label to rest just under the axis, exactly where its sticky copy will then sit.
 function panToLane(d){ const g=laneGeom(Z.L); animatePanY(6-labelTopAt(g,d,Math.floor(leftColF(g)))*Z.k); }
@@ -496,7 +510,7 @@ const ptrs=new Map(); let drag=null, moved=false, vx=0, vy=0, inertia=0, pinchD=
 function rel(ev){ const r=vp.getBoundingClientRect(); return [ev.clientX-r.left, ev.clientY-r.top]; }
 function tileAt(x,y){ for(const el of Object.values(Z.el)){ const r=el.getBoundingClientRect(); if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom) return el; } return null; }
 function activateTile(el,x,y){ const p=posts[+el.dataset.i]; if(Z.L===0) goLevel(1,x,y,true,p,true); else openReader(p); }
-vp.addEventListener('pointerdown',ev=>{ if(ev.button!==0&&ev.pointerType==='mouse') return; vp.setPointerCapture(ev.pointerId); const [x,y]=rel(ev); ptrs.set(ev.pointerId,[x,y]); cancelAnimationFrame(inertia); clearTimeout(Z.snapT); killSettle(); tip.hidden=true;
+vp.addEventListener('pointerdown',ev=>{ if(ev.button!==0&&ev.pointerType==='mouse') return; vp.setPointerCapture(ev.pointerId); const [x,y]=rel(ev); ptrs.set(ev.pointerId,[x,y]); cancelAnimationFrame(inertia); clearTimeout(Z.snapT); killSettle(); setMoving(true); tip.hidden=true;
   if(ptrs.size===1){ drag={x,y,t:performance.now()}; moved=false; vx=vy=0; } else if(ptrs.size===2){ clearFocusPadding(); drag=null; const [a,b]=[...ptrs.values()]; pinchD=Math.hypot(a[0]-b[0],a[1]-b[1]); } });
 vp.addEventListener('pointermove',ev=>{ const [x,y]=rel(ev); Z.lastX=x; Z.lastY=y; if(!ptrs.has(ev.pointerId)){ return; } ptrs.set(ev.pointerId,[x,y]);
   if(ptrs.size===2){ const [a,b]=[...ptrs.values()]; const d=Math.hypot(a[0]-b[0],a[1]-b[1]); if(pinchD>0){ zoomToward(Math.pow(d/pinchD,1.35),(a[0]+b[0])/2,(a[1]+b[1])/2,1); } pinchD=d; moved=true; return; }
@@ -553,7 +567,7 @@ vp.addEventListener('wheel',ev=>{ const [x,y]=rel(ev); Z.lastX=x; Z.lastY=y;
   // boundaries, so Chrome cannot reinterpret it as Back or Forward navigation.
   ev.preventDefault();
   let dx=ev.deltaX, dy=ev.deltaY; if(ev.shiftKey&&!dx){ dx=dy; dy=0; } if(ev.deltaMode===1){ dx*=16; dy*=16; }
-  const tx=Z.tx, ty=Z.ty; Z.tx-=dx; Z.ty-=dy; clampPan(); if(Z.tx===tx&&Z.ty===ty){ return; } killSettle(); applyCamera(); sync(); },{passive:false});
+  const tx=Z.tx, ty=Z.ty; Z.tx-=dx; Z.ty-=dy; clampPan(); if(Z.tx===tx&&Z.ty===ty){ return; } killSettle(); setMoving(true); applyCamera(); sync(); },{passive:false});
 // Title tiles already show their title, so the hover card only adds what the tile leaves out.
 world.addEventListener('pointerover',ev=>{ const t=ev.target.closest('.tile'); if(!t) return; const p=posts[+t.dataset.i]; t.classList.add('hit'); tip.hidden=false;
   tip.innerHTML=`<div class="m">#${pad(p.num)} · ${p.date}</div>${Z.L===0?`<div class="t">${esc(p.title)}</div>`:''}<div class="g">${THEMES[p.th]}${p.tags.length?' · '+esc(p.tags.join(', ')):''}</div>`; });
@@ -572,7 +586,7 @@ world.addEventListener('pointermove',ev=>{
   tip.style.left=tx+'px'; tip.style.top=ty+'px';
 });
 world.addEventListener('pointerout',ev=>{ const t=ev.target.closest('.tile'); if(!t) return; t.classList.remove('hit'); tip.hidden=true; });
-zui.addEventListener('keydown',ev=>{ const k=ev.key; if(k==='+'||k==='='){ goLevel(Z.L+1); } else if(k==='-'||k==='_'){ goLevel(Z.L-1); } else if(k==='0'){ resetView(); } else if(k==='ArrowLeft'){ Z.tx+=80; } else if(k==='ArrowRight'){ Z.tx-=80; } else if(k==='ArrowUp'){ Z.ty+=80; } else if(k==='ArrowDown'){ Z.ty-=80; } else return; ev.preventDefault(); clampPan(); applyCamera(); sync(); });
+zui.addEventListener('keydown',ev=>{ const k=ev.key; if(k==='+'||k==='='){ goLevel(Z.L+1); } else if(k==='-'||k==='_'){ goLevel(Z.L-1); } else if(k==='0'){ resetView(); } else if(k==='ArrowLeft'){ Z.tx+=80; } else if(k==='ArrowRight'){ Z.tx-=80; } else if(k==='ArrowUp'){ Z.ty+=80; } else if(k==='ArrowDown'){ Z.ty-=80; } else return; ev.preventDefault(); setMoving(true); clampPan(); applyCamera(); sync(); });
 mini.addEventListener('pointerdown',ev=>{ ev.stopPropagation(); const r=mini.getBoundingClientRect(); const go=e=>{ const g=laneGeom(Z.L); const wx=(e.clientX-r.left)/r.width*g.W, wy=(e.clientY-r.top)/r.height*g.H; Z.tx=Z.vw/2-wx*Z.k; Z.ty=Z.vh/2-wy*Z.k; clampPan(); applyCamera(); sync(); }; go(ev); const mv=e=>go(e); const up=()=>{ window.removeEventListener('pointermove',mv); window.removeEventListener('pointerup',up); }; window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up); });
 function resetView(){ Z.L=0; Z.k=1; Z.tx=0; Z.ty=0; Z.focusMaxY=0; Z.focusMinY=null; layoutWorld(); clampPan(); applyCamera(); sync(true); updateLevelUI(); writeHash(); }
 
