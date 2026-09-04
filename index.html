@@ -142,9 +142,8 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);o
 .reader{display:none;position:fixed;z-index:12;right:0;top:0;width:var(--reader-w);height:100vh;height:100dvh;min-height:0;border-left:1px solid color-mix(in oklab,var(--rule) 82%,var(--accent));overflow:hidden;background:var(--surface)}
 .reader.open{display:block}
 .workspace.reader-open .mini{right:calc(var(--reader-w) + 14px)}
-.reader-head{position:absolute;z-index:4;right:10px;top:8px;width:32px;height:32px;pointer-events:none}
-.reader-head .iconb{width:32px;height:32px;min-width:32px;padding:0;pointer-events:auto;border-color:color-mix(in oklab,var(--rule) 70%,transparent);border-radius:50%;background:color-mix(in oklab,var(--panel) 68%,transparent);-webkit-backdrop-filter:blur(10px) saturate(1.12);backdrop-filter:blur(10px) saturate(1.12);box-shadow:0 2px 9px rgba(12,28,20,.10);font-size:17px}
-.reader-head .iconb:hover{background:color-mix(in oklab,var(--panel) 82%,transparent);border-color:color-mix(in oklab,var(--accent) 55%,var(--rule));color:var(--ink)}
+#reader-close{position:absolute;z-index:4;right:10px;top:8px;width:32px;height:32px;min-width:32px;padding:0;border-color:color-mix(in oklab,var(--rule) 70%,transparent);border-radius:50%;background:color-mix(in oklab,var(--panel) 68%,transparent);-webkit-backdrop-filter:blur(10px) saturate(1.12);backdrop-filter:blur(10px) saturate(1.12);box-shadow:0 2px 9px rgba(12,28,20,.10);font-size:17px}
+#reader-close:hover{background:color-mix(in oklab,var(--panel) 82%,transparent);border-color:color-mix(in oklab,var(--accent) 55%,var(--rule));color:var(--ink)}
 .reader-body{position:absolute;inset:0;min-height:0;background:color-mix(in oklab,var(--surface) 96%,var(--ink))}
 .reader-body::after{content:"";position:absolute;z-index:3;left:0;top:0;width:38%;height:2px;background:var(--accent);opacity:0;transform:translateX(-110%);pointer-events:none}
 .reader.loading .reader-body::after{opacity:1;background:var(--signal-green);animation:reader-progress 1.05s cubic-bezier(.45,0,.25,1) infinite}
@@ -183,9 +182,7 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);o
       <div class="status" id="status"></div>
     </div>
     <aside class="reader" id="reader" aria-label="Article reader" aria-hidden="true">
-      <div class="reader-head">
-        <button class="iconb" id="reader-close" aria-label="Close article reader">×</button>
-      </div>
+      <button class="iconb" id="reader-close" aria-label="Close article reader">×</button>
       <div class="reader-body">
         <iframe id="reader-frame" title="Article"></iframe>
         <div class="reader-loading" role="status" aria-live="polite">Loading article…</div>
