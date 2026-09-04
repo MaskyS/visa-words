@@ -77,12 +77,12 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);o
 .pill{position:absolute;left:0;top:0;display:inline-flex;align-items:center;gap:7px;height:22px;padding:0 6px 0 2px;font:500 11px/1 "IBM Plex Sans",sans-serif;letter-spacing:.035em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap;pointer-events:none}
 .pill i{width:8px;height:8px;border-radius:50%;background:var(--c);flex:none}
 .wl{z-index:1}
-.labels .lb{background:var(--scrim);backdrop-filter:blur(4px);border-radius:4px;padding:0 8px 0 6px}
+.labels .lb{background:var(--scrim);border-radius:4px;padding:0 8px 0 6px}
 /* Off-screen lanes dock at the edge they left through, nearest lane closest to the content. */
 .dock{position:absolute;left:8px;display:flex;flex-direction:column;align-items:flex-start;gap:3px}
 .dock.top{top:6px}
 .dock.bottom{bottom:8px}
-.pill.dk{position:static;pointer-events:auto;cursor:pointer;appearance:none;border:0;height:18px;padding:0 7px 0 5px;gap:5px;font-size:10px;background:var(--scrim);backdrop-filter:blur(4px);border-radius:4px;box-shadow:0 0 0 1px var(--rule-2);transition:background .15s ease,color .15s ease}
+.pill.dk{position:static;pointer-events:auto;cursor:pointer;appearance:none;border:0;height:18px;padding:0 7px 0 5px;gap:5px;font-size:10px;background:var(--scrim);border-radius:4px;box-shadow:0 0 0 1px var(--rule-2);transition:background .15s ease,color .15s ease}
 .pill.dk[hidden]{display:none}
 .pill.dk:hover{color:var(--ink);background:var(--panel);box-shadow:0 0 0 1px var(--rule)}
 .pill.dk i{width:7px;height:7px}
@@ -224,6 +224,8 @@ let readerLoadStarted=0, readerLoadTimer=0, revealAnim=0;
 
 // ---------- layout ----------
 function computeUnits(){ Z.vw=vp.clientWidth; Z.vh=vp.clientHeight; Z.U=Math.max(20, Z.vw/LV[0].pitch);
+  // Fixed-size chrome is measured here rather than every frame, so per-frame rendering never forces a layout.
+  Z.cornerW=stickyYear.offsetWidth||48; Z.miniW=mini.clientWidth; Z.miniH=mini.clientHeight;
   const tOf=p=>mode==='index'?p.tIndex:p.tDate; posts.forEach(p=>{ const t=tOf(p); p.u=(REV?1-t:t)*(Z.U-1); p.pos=p.pos||[]; p.w=p.w||[]; p.h=p.h||[]; }); Z.marks=null;
   Z.lay=LV.map((lv,L)=>layoutLevel(L)); }
 // Each lane is packed on top of the bottom envelope of the lane above, column by column, so lanes hug their content.
@@ -232,7 +234,7 @@ const THIN=8;
 // the narrower running mean that follows turns the column staircase into a curve.
 // The mean window must stay narrower than the maximum window, or the curve could
 // dip below a card at the edge of a stack.
-const RIB_MAX=5, RIB_AVG=4;
+const RIB_MAX=3, RIB_AVG=2;
 function ribbonEnvelope(NF,C){ const M=new Float64Array(C), S=new Float64Array(C);
   for(let c=0;c<C;c++){ let m=0; for(let i=Math.max(0,c-RIB_MAX);i<=Math.min(C-1,c+RIB_MAX);i++) if(NF[i]>m) m=NF[i]; M[c]=m; }
   for(let c=0;c<C;c++){ let s=0,n=0; for(let i=Math.max(0,c-RIB_AVG);i<=Math.min(C-1,c+RIB_AVG);i++){ s+=M[i]; n++; } S[c]=s/n; }
@@ -333,9 +335,10 @@ function mount(p,L,enter){ let el=Z.el[p.i]; if(!el){ el=Z.pool.pop()||document.
 function unmount(i){ const el=Z.el[i]; if(!el) return; el.remove(); el.className='tile'; el.dataset.l=''; delete Z.el[i]; Z.pool.push(el); }
 function visibleSet(L,margin=160){ const x0=(-Z.tx)/Z.k-margin, x1=(-Z.tx+Z.vw)/Z.k+margin, y0=(-Z.ty)/Z.k-margin, y1=(-Z.ty+Z.vh)/Z.k+margin; const lv=LV[L]; const out=[];
   for(const p of posts){ const [x,y]=tilePos(p,L); if(x+p.w[L]<x0||x>x1||y+p.h[L]<y0||y>y1) continue; out.push(p); } return out; }
-function sync(force){ const L=Z.L; const all=L===0; const vis = all ? posts : visibleSet(L); const keep=new Set(vis.map(p=>p.i));
+// margin widens the mounted area (in world px) and quiet skips the entry fade, for pre-mounting ahead of a zoom.
+function sync(force,margin,quiet){ const L=Z.L; const all=L===0; const vis = all ? posts : visibleSet(L,margin); const keep=new Set(vis.map(p=>p.i));
   if(!Z.settling){ for(const i in Z.el){ if(!keep.has(+i)) unmount(+i); } }
-  for(const p of vis){ if(!Z.el[p.i]||force) mount(p,L,!all&&!force); } }
+  for(const p of vis){ if(!Z.el[p.i]||force) mount(p,L,!all&&!force&&!quiet); } }
 
 // ---------- level changes ----------
 function goLevel(L2,ax,ay,centerVertical=false,focusPost=null,allowEdgePadding=false){ L2=clamp(L2,0,TOP); if(ax==null){ax=Z.vw/2;ay=Z.vh/2;} const L1=Z.L; if(L2===L1&&Math.abs(Z.k-1)<1e-6) return;
@@ -369,20 +372,33 @@ function killSettle(){ clearTimeout(Z.settleT); if(Z.settling){ Z.settling=false
 // dots swelling to several times their size for half a second before anything happened.
 const UP=1.35, DOWN=0.78;
 function crossedLevel(){ return (Z.L===0&&Z.k>=UP)||(Z.L===TOP&&Z.k<=DOWN); }
-function zoomBy(f,ax,ay){ const e=Z.k*sOf(Z.L), e2=e*f; if(e2<1||e2>sOf(TOP)*UP) return; const wx=(ax-Z.tx)/Z.k, wy=(ay-Z.ty)/Z.k; Z.k*=f; Z.kTarget=Z.k; Z.tx=ax-wx*Z.k; Z.ty=ay-wy*Z.k; clampPan(); applyCamera(); sync(); if(crossedLevel()) snap(); }
-function zoomToward(f,ax,ay){ const lo=1/sOf(Z.L), hi=sOf(TOP)*UP/sOf(Z.L); Z.kTarget=clamp((Z.kTarget||Z.k)*f,lo,hi); Z.ax=ax; Z.ay=ay; if(!Z.zoomAnim) Z.zoomAnim=requestAnimationFrame(zoomStep); }
-function zoomStep(){ Z.zoomAnim=0; const d=Z.kTarget-Z.k; if(Math.abs(d)<0.0015){ if(Z.k!==Z.kTarget){ const wx=(Z.ax-Z.tx)/Z.k, wy=(Z.ay-Z.ty)/Z.k; Z.k=Z.kTarget; Z.tx=Z.ax-wx*Z.k; Z.ty=Z.ay-wy*Z.k; clampPan(); applyCamera(); sync(); } return; }
-  const k2=Z.k+d*(reduced?1:0.22); const wx=(Z.ax-Z.tx)/Z.k, wy=(Z.ay-Z.ty)/Z.k; Z.k=k2; Z.tx=Z.ax-wx*Z.k; Z.ty=Z.ay-wy*Z.k; clampPan(); applyCamera(); sync();
+// Zoom input only moves the target scale; one frame callback applies it, so a burst of wheel
+// events costs one camera update. Trackpad pinches track the fingers 1:1 (ease 1); mouse wheel
+// notches are eased. While the scale is in motion nothing mounts or unmounts: the tiles the whole
+// gesture could need are mounted once when it begins, because changing the world's content every
+// frame forced the browser to re-rasterize it under the zoom, which is what made pinching choppy.
+function zoomToward(f,ax,ay,ease=0.22){ if(performance.now()<(Z.zoomLockUntil||0)) return; const lo=1/sOf(Z.L), hi=sOf(TOP)*UP/sOf(Z.L);
+  if(!Z.zoomActive){ Z.zoomActive=true; killSettle(); clearFocusPadding(); sync(false,0.3*Math.max(Z.vw,Z.vh)/Z.k+160,true); }
+  Z.springing=false; Z.kTarget=clamp((Z.kTarget||Z.k)*f,lo,hi); Z.ax=ax; Z.ay=ay; Z.zoomEase=reduced?1:ease; if(!Z.zoomAnim) Z.zoomAnim=requestAnimationFrame(zoomStep); }
+function applyScale(k){ const wx=(Z.ax-Z.tx)/Z.k, wy=(Z.ay-Z.ty)/Z.k; Z.k=k; Z.tx=Z.ax-wx*Z.k; Z.ty=Z.ay-wy*Z.k; clampPan(); applyCamera(); }
+function zoomStep(){ Z.zoomAnim=0; const d=Z.kTarget-Z.k;
+  // The gesture stays active until the snap timer fires, so a pause between pinch events does not resync the tiles.
+  if(Math.abs(d)<0.0015){ if(Z.k!==Z.kTarget) applyScale(Z.kTarget); if(Z.zoomActive) return; sync(); if(Z.springing){ Z.springing=false; writeHash(); } return; }
+  applyScale(Z.k+d*Z.zoomEase);
   if(crossedLevel()){ snap(); return; }
   Z.zoomAnim=requestAnimationFrame(zoomStep); }
-function scheduleSnap(){ clearTimeout(Z.snapT); Z.snapT=setTimeout(snap,460); }
+function scheduleSnap(){ clearTimeout(Z.snapT); Z.snapT=setTimeout(snap,300); }
 function clearFocusPadding(){ if(!Z.focusMaxY&&Z.focusMinY==null) return; Z.focusMaxY=0; Z.focusMinY=null; clampPan(); applyCamera(); sync(); }
 function nearestTileAt(x,y,maxDistance=90){ const vr=vp.getBoundingClientRect(), cx=vr.left+x, cy=vr.top+y; let best=null, bestD=maxDistance*maxDistance; for(const [i,el] of Object.entries(Z.el)){ const r=el.getBoundingClientRect(), dx=(r.left+r.width/2)-cx, dy=(r.top+r.height/2)-cy, d=dx*dx+dy*dy; if(d<bestD){ bestD=d; best=posts[+i]; } } return best; }
-function snap(){ cancelAnimationFrame(Z.zoomAnim); Z.zoomAnim=0; clearTimeout(Z.snapT); if(crossedLevel()) Z.kTarget=Z.k; Z.k=Z.kTarget||Z.k; const from=Z.L; let target=from; if(from===0&&Z.k>=UP) target=1; else if(from===1&&Z.k<=DOWN) target=0;
-  // A gesture that stops between semantic levels is still a valid zoom. Keep that
-  // exact scale instead of snapping the current level back to 1x.
-  if(target===from){ Z.kTarget=Z.k; clampPan(); applyCamera(); sync(); writeHash(); return; }
-  const x=Z.lastX??Z.vw/2,y=Z.lastY??Z.vh/2; goLevel(target,x,y,true,nearestTileAt(x,y)); }
+function snap(){ cancelAnimationFrame(Z.zoomAnim); Z.zoomAnim=0; clearTimeout(Z.snapT); Z.zoomActive=false; const from=Z.L; let target=from; if(from===0&&Z.k>=UP) target=1; else if(from===TOP&&Z.k<=DOWN) target=0;
+  if(target!==from){
+    // The switch is the gesture's outcome. Trailing pinch deltas are dropped for a beat so they
+    // neither cut the settle animation short nor inflate the new level past its native scale.
+    Z.zoomLockUntil=performance.now()+400; const x=Z.lastX??Z.vw/2,y=Z.lastY??Z.vh/2; goLevel(target,x,y,true,nearestTileAt(x,y)); return; }
+  // Between levels there is nothing sharper to show, and the browser never re-rasterizes the
+  // scaled layer, so a gesture that stops short springs back to the level's native scale.
+  if(Math.abs(Z.k-1)>1e-6){ Z.kTarget=1; Z.zoomEase=reduced?1:0.3; Z.ax=Z.lastX??Z.vw/2; Z.ay=Z.lastY??Z.vh/2; Z.springing=true; Z.zoomAnim=requestAnimationFrame(zoomStep); }
+  else { sync(); writeHash(); } }
 function updateLevelUI(){ [...document.getElementById('levels').children].forEach((b,i)=>b.setAttribute('aria-pressed',String(i===Z.L))); zui.classList.toggle('titles',Z.L===1); updateHint(); }
 
 // ---------- furniture ----------
@@ -390,7 +406,7 @@ function renderAxis(){ const e=Z.k*LV[Z.L].pitch; axis.innerHTML=''; vlines.inne
   const leftU=clamp(u0,0,Z.U-1), leftT=REV?1-leftU/(Z.U-1):leftU/(Z.U-1);
   stickyYear.textContent=mode==='date'?String(new Date(T0+leftT*(T1-T0)).getUTCFullYear()):String(posts[clamp(Math.round(leftT*(N-1)),0,N-1)].year);
   // The sticky year sits over the left end of the axis; a tick label under it would collide.
-  const cornerW=stickyYear.offsetWidth;
+  const cornerW=Z.cornerW;
   const mk=(u,label,cls='')=>{ const x=Z.tx+u*e; if(x<-60||x>Z.vw+60) return; if(label&&x<(cls.includes('left')?cornerW+40:cornerW+4)) label=''; const d=document.createElement('div'); d.className='tk'+(cls?' '+cls:''); d.style.left=x+'px'; if(label){ const s=document.createElement('span'); s.textContent=label; d.appendChild(s);} frag.appendChild(d); const l=document.createElement('div'); l.className=cls.includes('minor')?'':'major'; l.style.left=x+'px'; vf.appendChild(l); };
   if(mode==='index'){ // year and month boundaries located at the first post of each year / month
     if(!Z.marks){ Z.marks=[]; let pm=''; for(const p of [...posts].sort((a,b)=>a.u-b.u)){ const ym=p.date.slice(0,7); if(ym!==pm){ Z.marks.push({p,ym,year:pm===''||pm.slice(0,4)!==ym.slice(0,4)}); pm=ym; } } }
@@ -450,7 +466,7 @@ function renderGutter(){ const g=laneGeom(Z.L); if(!G.sticky.length) buildGutter
     let pick=null; if(!show){ pick=runs.find(r=>{ const sx=Z.tx+r.x*Z.k, ex=Z.tx+(r.c1+1)*g.grid*Z.k; return ex>0 && sx>=8 && sx<Z.vw; })||null; }
     for(const r of runs){ if(r.el) r.el.style.opacity = r===pick ? 1 : 0; } } }
 // The minimap draws the layout of the level you are on, squeezed to its box, so the box maps to the canvas exactly.
-function renderMini(){ const W=mini.clientWidth,H=mini.clientHeight; if(!W) return; const L=Z.L, g=laneGeom(L); if(!g) return; const sx=W/g.W, sy=H/g.H; const c=miniC; if(c.width!==W*2||c.height!==H*2){ c.width=W*2; c.height=H*2; Z.miniDirty=true; }
+function renderMini(){ const W=Z.miniW,H=Z.miniH; if(!W) return; const L=Z.L, g=laneGeom(L); if(!g) return; const sx=W/g.W, sy=H/g.H; const c=miniC; if(c.width!==W*2||c.height!==H*2){ c.width=W*2; c.height=H*2; Z.miniDirty=true; }
   if(Z.miniDirty||Z.miniL!==L||Z.miniMode!==mode){ Z.miniDirty=false; Z.miniL=L; Z.miniMode=mode; const ctx=c.getContext('2d'); ctx.setTransform(2,0,0,2,0,0); ctx.clearRect(0,0,W,H); const cs=getComputedStyle(document.documentElement);
     ctx.save(); ctx.scale(sx,sy); ctx.globalAlpha=.14; for(let d=0;d<K;d++){ ctx.fillStyle=cs.getPropertyValue(COLORS[d].slice(4,-1)).trim()||'#888'; ctx.fill(new Path2D(ribbonD(d,g))); } ctx.restore();
     for(const p of posts){ const [x,y]=p.pos[L]; ctx.fillStyle=cs.getPropertyValue(COLORS[p.th].slice(4,-1)).trim()||'#888'; ctx.globalAlpha=isFiltered(p)?0.15:0.9; ctx.fillRect(x*sx,y*sy,Math.max(1,p.w[L]*sx),Math.max(1,p.h[L]*sy)); } ctx.globalAlpha=1; }
@@ -464,7 +480,7 @@ function activateTile(el,x,y){ const p=posts[+el.dataset.i]; if(Z.L===0) goLevel
 vp.addEventListener('pointerdown',ev=>{ if(ev.button!==0&&ev.pointerType==='mouse') return; vp.setPointerCapture(ev.pointerId); const [x,y]=rel(ev); ptrs.set(ev.pointerId,[x,y]); cancelAnimationFrame(inertia); clearTimeout(Z.snapT); killSettle(); tip.hidden=true;
   if(ptrs.size===1){ drag={x,y,t:performance.now()}; moved=false; vx=vy=0; } else if(ptrs.size===2){ clearFocusPadding(); drag=null; const [a,b]=[...ptrs.values()]; pinchD=Math.hypot(a[0]-b[0],a[1]-b[1]); } });
 vp.addEventListener('pointermove',ev=>{ const [x,y]=rel(ev); Z.lastX=x; Z.lastY=y; if(!ptrs.has(ev.pointerId)){ return; } ptrs.set(ev.pointerId,[x,y]);
-  if(ptrs.size===2){ const [a,b]=[...ptrs.values()]; const d=Math.hypot(a[0]-b[0],a[1]-b[1]); if(pinchD>0){ zoomBy(Math.pow(d/pinchD,1.35),(a[0]+b[0])/2,(a[1]+b[1])/2); } pinchD=d; moved=true; return; }
+  if(ptrs.size===2){ const [a,b]=[...ptrs.values()]; const d=Math.hypot(a[0]-b[0],a[1]-b[1]); if(pinchD>0){ zoomToward(Math.pow(d/pinchD,1.35),(a[0]+b[0])/2,(a[1]+b[1])/2,1); } pinchD=d; moved=true; return; }
   if(!drag) return; const dx=x-drag.x, dy=y-drag.y; if(Math.abs(dx)+Math.abs(dy)>3){ moved=true; vp.classList.add('dragging'); } const now=performance.now(), dt=Math.max(1,now-drag.t); vx=0.7*vx+0.3*dx/dt*16; vy=0.7*vy+0.3*dy/dt*16; drag={x,y,t:now}; Z.tx+=dx; Z.ty+=dy; clampPan(); applyCamera(); sync(); });
 function endPtr(ev){ if(!ptrs.has(ev.pointerId)) return; ptrs.delete(ev.pointerId); vp.classList.remove('dragging');
   if(ptrs.size===1){ const [x,y]=[...ptrs.values()][0]; drag={x,y,t:performance.now()}; pinchD=0; snapAfterPinch(); return; }
@@ -513,7 +529,7 @@ function closeReader(){
 document.getElementById('reader-close').onclick=closeReader;
 vp.addEventListener('dblclick',ev=>{ if(ev.target.closest('.tile')) return; const [x,y]=rel(ev); goLevel(Z.L+1,x,y,true); });
 vp.addEventListener('wheel',ev=>{ const [x,y]=rel(ev); Z.lastX=x; Z.lastY=y;
-  if(ev.ctrlKey||ev.metaKey){ ev.preventDefault(); killSettle(); clearFocusPadding(); zoomToward(Math.exp(-ev.deltaY*0.0125),x,y); scheduleSnap(); return; }
+  if(ev.ctrlKey||ev.metaKey){ ev.preventDefault(); if(gestureActive) return; const trackpad=ev.deltaMode===0&&Math.abs(ev.deltaY)<50; zoomToward(Math.exp(-ev.deltaY*0.0125),x,y,trackpad?1:0.22); scheduleSnap(); return; }
   // Keep horizontal trackpad overscroll inside the calendar, including at its
   // boundaries, so Chrome cannot reinterpret it as Back or Forward navigation.
   ev.preventDefault();
@@ -584,6 +600,11 @@ function readHash(){ const h=new URLSearchParams(location.hash.slice(1)); const 
 // keep the browser from zooming the page itself; the chart owns pinch and ctrl-scroll
 document.addEventListener('wheel',ev=>{ if(ev.ctrlKey||ev.metaKey) ev.preventDefault(); },{passive:false});
 document.addEventListener('gesturestart',ev=>ev.preventDefault(),{passive:false}); document.addEventListener('gesturechange',ev=>ev.preventDefault(),{passive:false});
+// Safari reports a trackpad pinch through gesture events rather than ctrl+wheel; while one is active the wheel path stands down.
+let gestureActive=false, gestureScale=1;
+vp.addEventListener('gesturestart',ev=>{ ev.preventDefault(); gestureActive=true; gestureScale=1; },{passive:false});
+vp.addEventListener('gesturechange',ev=>{ ev.preventDefault(); const f=ev.scale/gestureScale; gestureScale=ev.scale; const [x,y]=rel(ev); Z.lastX=x; Z.lastY=y; zoomToward(f,x,y,1); scheduleSnap(); },{passive:false});
+vp.addEventListener('gestureend',ev=>{ ev.preventDefault(); gestureActive=false; scheduleSnap(); },{passive:false});
 document.addEventListener('keydown',ev=>{ if((ev.ctrlKey||ev.metaKey)&&(ev.key==='+'||ev.key==='-'||ev.key==='='||ev.key==='0')) ev.preventDefault(); });
 document.addEventListener('keydown',ev=>{ if(ev.key==='Escape'&&reader.classList.contains('open')){ ev.preventDefault(); closeReader(); } });
 // ---------- boot ----------
