@@ -127,7 +127,7 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);o
 /* During a level change the outgoing world and ribbons become ghosts that keep travelling in the zoom's direction as they fade. */
 .ghost{pointer-events:none}
 .tile{position:absolute;left:0;top:0;transform-origin:0 0;border-radius:3px;overflow:hidden;cursor:pointer;color:var(--ink);font-family:"IBM Plex Sans",sans-serif;line-height:1.25;
-  background:color-mix(in oklab,var(--c) 11%,var(--panel));border-left:3px solid var(--c);padding:0 6px;display:flex;align-items:center;gap:4px;transition:opacity .25s,background .16s ease,box-shadow .16s ease,outline-color .16s ease}
+  background:color-mix(in oklab,var(--c) 11%,var(--panel));border-left:3px solid var(--c);padding:0 6px;display:flex;align-items:center;gap:4px;transition:background .16s ease,box-shadow .16s ease}
 .tile.settling{transition:transform .3s cubic-bezier(.22,.61,.36,1),width .3s cubic-bezier(.22,.61,.36,1),height .3s cubic-bezier(.22,.61,.36,1),opacity .24s}
 .tile.dim{opacity:.10}
 /* Hover lifts the card a little; the open card wears one ring in its own lane colour. No offset outlines, which drew a second, detached border. */
@@ -409,19 +409,22 @@ function goLevel(L2,ax,ay,centerVertical=false,focusPost=null,allowEdgePadding=f
     for(const [i,el] of Object.entries(Z.el)){ const or=oldRects.get(+i); if(!or) continue; const nr=el.getBoundingClientRect(); if(nr.right<vr.left-40||nr.left>vr.right+40||nr.bottom<vr.top-40||nr.top>vr.bottom+40) continue;
       const p=posts[+i], [x,y]=tilePos(p,L2), nw=p.w[L2], nh=p.h[L2], dcx=(or.left+or.width/2)-(nr.left+nr.width/2), dcy=(or.top+or.height/2)-(nr.top+nr.height/2);
       const s0=zoomIn?0.18:clamp(Math.sqrt(or.width*or.height/(nw*nh))*0.3,1.5,4);
-      el.getAnimations().forEach(anim=>anim.cancel());
-      el.animate([{transform:`translate(${(x+dcx+nw*(1-s0)/2).toFixed(1)}px,${(y+dcy+nh*(1-s0)/2).toFixed(1)}px) scale(${s0})`},{transform:`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`}],{duration,easing:ease,fill:'none'});
+      cancelFlip(el);
+      el._flip=el.animate([{transform:`translate(${(x+dcx+nw*(1-s0)/2).toFixed(1)}px,${(y+dcy+nh*(1-s0)/2).toFixed(1)}px) scale(${s0})`},{transform:`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`}],{duration,easing:ease,fill:'none'}); el._flip.onfinish=()=>{ el._flip=null; };
       if(zoomIn&&oldTiles&&oldTiles[i]) oldTiles[i].style.visibility='hidden'; }
-    world.animate([{opacity:0},{opacity:1}],{duration:duration*.7,easing:'ease-out'});
-    ribbons.animate([{opacity:0},{opacity:1}],{duration,easing:'ease-out'});
+    world._fade=world.animate([{opacity:0},{opacity:1}],{duration:duration*.7,easing:'ease-out'}); world._fade.onfinish=()=>{ world._fade=null; };
+    ribbons._fade=ribbons.animate([{opacity:0},{opacity:1}],{duration,easing:'ease-out'}); ribbons._fade.onfinish=()=>{ ribbons._fade=null; };
     if(ghosts){ const gs=zoomIn?2.2:0.6, frames=[{transform:`translate(${otx}px,${oty}px) scale(${ok})`,opacity:1},{transform:`translate(${ax-(ax-otx)*gs}px,${ay-(ay-oty)*gs}px) scale(${ok*gs})`,opacity:0}];
-      for(const g of ghosts) g.animate(frames,{duration,easing:ease,fill:'forwards'}).onfinish=()=>recycleGhost(g); }
+      for(const g of ghosts){ g._fade=g.animate(frames,{duration,easing:ease,fill:'forwards'}); g._fade.onfinish=()=>{ g._fade=null; recycleGhost(g); }; } }
     Z.settling=true; clearTimeout(Z.settleT); Z.settleT=setTimeout(()=>{ Z.settling=false; sync(); setMoving(false); },duration+20);
   } else setMoving(false);
   updateLevelUI(); writeHash(); }
 // A finished ghost gives its tile nodes back to the pool, so the next level change reuses them.
-function recycleGhost(g){ if(g.classList.contains('world')){ for(const t of g.querySelectorAll('.tile')){ t.getAnimations().forEach(a=>a.cancel()); t.className='tile'; t.dataset.l=''; t.style.visibility=''; if(Z.pool.length<1200) Z.pool.push(t); } } g.remove(); }
-function killSettle(){ clearTimeout(Z.settleT); vp.querySelectorAll('.ghost').forEach(recycleGhost); if(Z.settling){ Z.settling=false; world.getAnimations().forEach(a=>a.cancel()); ribbons.getAnimations().forEach(a=>a.cancel()); document.querySelectorAll('.tile').forEach(e=>{ e.classList.remove('settling'); e.getAnimations().forEach(anim=>anim.cancel()); }); sync(); } }
+// Animations are tracked on the elements that own them. Element.getAnimations() scans every animation
+// in the document, so calling it per tile went quadratic and stalled the main thread for 800ms.
+function cancelFlip(el){ if(el._flip){ el._flip.cancel(); el._flip=null; } }
+function recycleGhost(g){ if(g.classList.contains('world')){ for(const t of g.querySelectorAll('.tile')){ cancelFlip(t); t.className='tile'; t.dataset.l=''; t.style.visibility=''; if(Z.pool.length<1200) Z.pool.push(t); } } if(g._fade){ g._fade.cancel(); g._fade=null; } g.remove(); }
+function killSettle(){ clearTimeout(Z.settleT); vp.querySelectorAll('.ghost').forEach(recycleGhost); if(Z.settling){ Z.settling=false; if(world._fade){ world._fade.cancel(); world._fade=null; } if(ribbons._fade){ ribbons._fade.cancel(); ribbons._fade=null; } for(const i in Z.el){ Z.el[i].classList.remove('settling'); cancelFlip(Z.el[i]); } sync(); } }
 // Semantic zoom thresholds: past UP the dots become titles, below DOWN titles become dots.
 // Crossing one mid-gesture switches level at once. Waiting for the gesture to end left the
 // dots swelling to several times their size for half a second before anything happened.
