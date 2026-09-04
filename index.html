@@ -428,7 +428,7 @@ function killSettle(){ clearTimeout(Z.settleT); vp.querySelectorAll('.ghost').fo
 // Semantic zoom thresholds: past UP the dots become titles, below DOWN titles become dots.
 // Crossing one mid-gesture switches level at once. Waiting for the gesture to end left the
 // dots swelling to several times their size for half a second before anything happened.
-const UP=1.8, DOWN=0.5, DOTS_LO=0.6, CARDS_HI=1.5; // dots rest anywhere in DOTS_LO..UP, cards in DOWN..CARDS_HI
+const UP=1.8, DOWN=0.5, DOTS_LO=0.95, CARDS_HI=1.5; // dots rest anywhere in DOTS_LO..UP, cards in DOWN..CARDS_HI
 function crossedLevel(){ return (Z.L===0&&Z.k>=UP)||(Z.L===TOP&&Z.k<=DOWN); }
 // Zoom input only moves the target scale; one frame callback applies it, so a burst of wheel
 // events costs one camera update. Trackpad pinches track the fingers 1:1 (ease 1); mouse wheel
