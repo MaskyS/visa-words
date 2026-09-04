@@ -42,7 +42,8 @@ body.reader-open .tag-panel{margin-right:calc(var(--reader-w) + 2px)}
 .tag-toggle:hover{color:var(--ink);background:transparent}
 .tag-toggle .caret{display:inline-block;width:14px;color:var(--ink-3)}
 .tag-toggle .k{font-family:"IBM Plex Mono",monospace;color:var(--ink-3);margin-left:4px}
-.tag-list{display:flex;flex-wrap:nowrap;gap:6px 8px;overflow-x:auto;overflow-y:hidden;padding:8px 2px 7px;scrollbar-width:thin;overscroll-behavior-x:contain}
+.tag-list{display:flex;flex-wrap:nowrap;gap:6px 8px;overflow-x:auto;overflow-y:hidden;padding:8px 2px 7px;scrollbar-width:none;overscroll-behavior-x:contain}
+.tag-list::-webkit-scrollbar{display:none}
 .tag-list[hidden]{display:none}
 .tagchip{padding-left:10px;flex:none}
 .tag-panel::before,.tag-panel::after{content:"";position:absolute;z-index:2;top:38px;bottom:4px;width:28px;pointer-events:none;opacity:0;transition:opacity .16s ease}
