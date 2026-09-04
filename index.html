@@ -29,7 +29,8 @@ h1{font:500 34px/1.05 Newsreader,Georgia,serif;letter-spacing:-.01em;margin:0 0 
 .stat .n{font:500 19px/1 "IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
 .stat .l{font-size:11.5px;color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase}
 .controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;margin:0 0 7px}
-body.reader-open .controls{flex-wrap:nowrap;overflow-x:auto;margin-right:calc(var(--reader-w) + 2px);scrollbar-width:thin}
+body.reader-open .controls{flex-wrap:nowrap;overflow-x:auto;margin-right:calc(var(--reader-w) + 2px);scrollbar-width:none}
+body.reader-open .controls::-webkit-scrollbar{display:none}
 body.reader-open .controls .legend{flex-wrap:nowrap}
 body.reader-open .controls .chip{flex:none}
 body.reader-open .tag-panel{margin-right:calc(var(--reader-w) + 2px)}
