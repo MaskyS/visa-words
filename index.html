@@ -3,11 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-</head>
-<body>
 <title>Word Vomit Coordinates</title>
+<link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+</head>
+<body>
 <style>
 :root{
   color-scheme:light;
@@ -20,14 +21,6 @@
 html,body{height:100%;touch-action:pan-x pan-y;overscroll-behavior-x:none}
 body{background:var(--surface);color:var(--ink);font:15px/1.5 "IBM Plex Sans",system-ui,-apple-system,sans-serif;margin:0;padding:0;overflow:hidden}
 .wrap{height:100vh;height:100dvh;padding:14px 16px 0;display:flex;flex-direction:column;overflow:hidden;--reader-w:clamp(360px,40vw,680px)}
-.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 40px;margin:0 0 16px}
-h1{font:500 34px/1.05 Newsreader,Georgia,serif;letter-spacing:-.01em;margin:0 0 8px;text-wrap:balance}
-.brief{font:400 17px/1.4 Newsreader,Georgia,serif;color:var(--ink-2);max-width:70ch;margin:0}
-.brief b{color:var(--ink);font-weight:500}
-.stats{display:flex;flex-wrap:wrap;gap:0 26px;padding:0}
-.stat{display:flex;align-items:baseline;gap:7px}
-.stat .n{font:500 19px/1 "IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
-.stat .l{font-size:11.5px;color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase}
 .controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;margin:0 0 7px}
 body.reader-open .controls{flex-wrap:nowrap;overflow-x:auto;margin-right:calc(var(--reader-w) + 2px);scrollbar-width:none}
 body.reader-open .controls::-webkit-scrollbar{display:none}
@@ -37,8 +30,7 @@ body.reader-open .tag-panel{margin-right:calc(var(--reader-w) + 2px)}
 .tag-panel{position:relative;margin:0 0 5px}
 .filter-head{display:flex;align-items:center;gap:14px;min-height:30px}
 .time-control,.view-control{display:flex;flex-direction:row;align-items:center;gap:7px;flex:none}
-.filter-head .seglbl{font-size:11px;line-height:1;font-weight:500;color:var(--ink-2);letter-spacing:.025em;margin:0}
-.filter-head .seg button{font-size:12px}
+.seglbl{font-size:11px;line-height:1;font-weight:500;color:var(--ink-2);letter-spacing:.025em;text-transform:uppercase}
 .tag-toggle{appearance:none;border:0;background:transparent;color:var(--ink-2);padding:3px 0;font:500 12px/1.4 "IBM Plex Sans",sans-serif;letter-spacing:.025em;text-transform:uppercase;cursor:pointer}
 .tag-toggle:hover{color:var(--ink);background:transparent}
 .tag-toggle .caret{display:inline-block;width:14px;color:var(--ink-3)}
@@ -51,18 +43,12 @@ body.reader-open .tag-panel{margin-right:calc(var(--reader-w) + 2px)}
 .tag-panel::before{left:0;background:linear-gradient(90deg,var(--surface),transparent)}
 .tag-panel::after{right:0;background:linear-gradient(270deg,var(--surface),transparent)}
 .tag-panel.can-scroll-left::before,.tag-panel.can-scroll-right::after{opacity:1}
-.seg{display:inline-flex;border:1px solid var(--rule);border-radius:5px;overflow:hidden;background:transparent}
-.seg button{appearance:none;border:0;background:transparent;color:var(--ink-2);font:500 13px/1 "IBM Plex Sans",sans-serif;padding:8px 12px;cursor:pointer}
+.seg{display:inline-flex;height:29px;border:1px solid var(--rule);border-radius:5px;overflow:hidden;background:transparent}
+.seg button{appearance:none;border:0;background:transparent;color:var(--ink-3);font:500 12px/1 "IBM Plex Sans",sans-serif;padding:0 9px;cursor:pointer}
 .seg button+button{border-left:1px solid var(--rule)}
-.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
-.seg button:hover:not([aria-pressed="true"]){background:var(--hover)}
-.time-control .seg,.view-control .seg{height:29px;border:1px solid var(--rule);border-radius:5px;background:transparent;overflow:hidden}
-.time-control .seg button,.view-control .seg button{padding:0 9px;border:0;border-radius:0;background:transparent;color:var(--ink-3)}
-.time-control .seg button+button,.view-control .seg button+button{border-left:1px solid var(--rule)}
-.time-control .seg button[aria-pressed="true"],.view-control .seg button[aria-pressed="true"]{background:var(--hover);color:var(--ink);font-weight:500;box-shadow:inset 0 -2px var(--accent)}
-.time-control .seg button:hover:not([aria-pressed="true"]),.view-control .seg button:hover:not([aria-pressed="true"]){background:var(--hover);color:var(--ink-2)}
+.seg button[aria-pressed="true"]{background:var(--hover);color:var(--ink);box-shadow:inset 0 -2px var(--accent)}
+.seg button:hover:not([aria-pressed="true"]){background:var(--hover);color:var(--ink-2)}
 button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);outline-offset:2px}
-.seglbl{font-size:11.5px;color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase;margin-right:8px}
 .iconb{appearance:none;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);height:30px;min-width:30px;padding:0 8px;border-radius:4px;font:500 14px/1 "IBM Plex Mono",monospace;cursor:pointer}
 .iconb:hover{background:var(--hover)}
 .legend{display:flex;flex-wrap:wrap;gap:6px 8px}
@@ -74,7 +60,7 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);o
 .chip[aria-pressed="true"] .k{color:var(--ink-2);opacity:1}
 .chip:hover{background:var(--hover)}
 .chip[aria-pressed="true"]:hover{background:color-mix(in oklab,var(--c) 17%,var(--surface))}
-.hint{font-size:12.5px;color:var(--ink-3)}
+.hint{font-size:12.5px;color:var(--ink-3);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* ---------- ZUI ---------- */
 .workspace{position:relative;display:flex;flex:1;min-width:0;min-height:0}
@@ -90,20 +76,28 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);o
 .labels{position:absolute;left:0;top:var(--A);right:0;bottom:0;overflow:hidden;z-index:2;pointer-events:none}
 .pill{position:absolute;left:0;top:0;display:inline-flex;align-items:center;gap:7px;height:22px;padding:0 6px 0 2px;font:500 11px/1 "IBM Plex Sans",sans-serif;letter-spacing:.035em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap;pointer-events:none}
 .pill i{width:8px;height:8px;border-radius:50%;background:var(--c);flex:none}
-.pill .ct{font:400 10px/1 "IBM Plex Mono",monospace;color:var(--ink-3);letter-spacing:0}
 .wl{z-index:1}
 .labels .lb{background:var(--scrim);backdrop-filter:blur(4px);border-radius:4px;padding:0 8px 0 6px}
+/* Off-screen lanes dock at the edge they left through, nearest lane closest to the content. */
+.dock{position:absolute;left:8px;display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+.dock.top{top:6px}
+.dock.bottom{bottom:8px}
+.pill.dk{position:static;pointer-events:auto;cursor:pointer;appearance:none;border:0;height:18px;padding:0 7px 0 5px;gap:5px;font-size:10px;background:var(--scrim);backdrop-filter:blur(4px);border-radius:4px;box-shadow:0 0 0 1px var(--rule-2);transition:background .15s ease,color .15s ease}
+.pill.dk[hidden]{display:none}
+.pill.dk:hover{color:var(--ink);background:var(--panel);box-shadow:0 0 0 1px var(--rule)}
+.pill.dk i{width:7px;height:7px}
+.pill.dk .caret{color:var(--ink-3);font-size:9px}
+.pill.dk .ct{font:400 9.5px/1 "IBM Plex Mono",monospace;color:var(--ink-3);letter-spacing:0}
+.pill.dk .ct:empty{display:none}
 .viewport{position:absolute;left:0;top:var(--A);right:0;bottom:0;overflow:hidden;touch-action:none;overscroll-behavior:none;cursor:grab}
 .viewport.dragging{cursor:grabbing}
-.pan-edge{position:absolute;z-index:8;pointer-events:none;opacity:0;transition:opacity .18s ease}
-.pan-edge.left,.pan-edge.right{top:0;bottom:0;width:22px}
-.pan-edge.top{left:0;right:var(--pan-right-inset,0px);height:22px}
-.pan-edge.bottom{left:0;right:var(--pan-right-inset,0px);height:28px}
-.pan-edge.left{left:0;background:linear-gradient(90deg,color-mix(in oklab,var(--accent-strong) 14%,transparent),transparent)}
-.pan-edge.right{right:var(--pan-right-inset,0px);background:linear-gradient(270deg,color-mix(in oklab,var(--accent-strong) 14%,transparent),transparent)}
-.pan-edge.top{top:0;background:linear-gradient(180deg,color-mix(in oklab,var(--accent-strong) 10%,transparent),transparent)}
-.pan-edge.bottom{bottom:0;background:linear-gradient(0deg,color-mix(in oklab,var(--accent-strong) 18%,transparent) 0,color-mix(in oklab,var(--accent-strong) 6%,transparent) 42%,transparent 100%)}
-.zui.can-pan-left .pan-edge.left,.zui.can-pan-right .pan-edge.right,.zui.can-pan-up .pan-edge.top,.zui.can-pan-down .pan-edge.bottom{opacity:1}
+/* Horizontal overflow fades to the panel colour: a neutral "continues" cue that leaves the ribbon hues alone and
+   claims no depth. Vertical overflow gets no fade. The axis already frames the top, and the docked lane pills
+   name what lies beyond the bottom. The fades sit under the gutter labels. */
+.pan-edge{position:absolute;z-index:1;top:0;bottom:0;width:20px;pointer-events:none;opacity:0;transition:opacity .18s ease}
+.pan-edge.left{left:0;background:linear-gradient(90deg,var(--panel),transparent)}
+.pan-edge.right{right:var(--pan-right-inset,0px);background:linear-gradient(270deg,var(--panel),transparent)}
+.zui.can-pan-left .pan-edge.left,.zui.can-pan-right .pan-edge.right{opacity:1}
 .vlines{position:absolute;inset:0;pointer-events:none}
 .vlines div{position:absolute;top:0;bottom:0;border-left:1px dotted var(--rule)}
 .vlines div.major{border-left:1px dashed color-mix(in oklab,var(--ink-3) 50%,transparent)}
@@ -111,6 +105,8 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);o
 .world.settling{transition:transform .3s cubic-bezier(.22,.61,.36,1)}
 .bounds{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
 .bounds path{fill-opacity:.047;stroke:none}
+/* Title cards cover most of their ribbon, so the margins that remain carry a little more tint. */
+.zui.titles .bounds path{fill-opacity:.07}
 .tile{position:absolute;left:0;top:0;transform-origin:0 0;border-radius:3px;overflow:hidden;cursor:pointer;color:var(--ink);font-family:"IBM Plex Sans",sans-serif;line-height:1.25;
   background:color-mix(in oklab,var(--c) 11%,var(--panel));border-left:3px solid var(--c);padding:0 6px;display:flex;align-items:center;gap:4px;transition:opacity .25s,background .16s ease,box-shadow .16s ease,outline-color .16s ease}
 .tile.settling{transition:transform .3s cubic-bezier(.22,.61,.36,1),width .3s cubic-bezier(.22,.61,.36,1),height .3s cubic-bezier(.22,.61,.36,1),opacity .24s}
@@ -120,26 +116,17 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);o
 .tile.open{outline:2px solid var(--accent-strong);outline-offset:2px;box-shadow:0 0 0 1px var(--c);z-index:4}
 .tile.l0{background:var(--c);border:0;padding:0;border-radius:1.5px;cursor:zoom-in}
 .tile.l0.hit{background:var(--c);outline:2px solid color-mix(in oklab,var(--accent) 72%,white);outline-offset:2px;box-shadow:0 0 0 1px color-mix(in oklab,var(--c) 65%,var(--ink));z-index:3}
-.tile .n{font:500 10px/1 "IBM Plex Mono",monospace;color:var(--ink-2);flex:none;letter-spacing:.01em}
 .tile sup{font:500 9px/1 "IBM Plex Mono",monospace;color:var(--ink-3);vertical-align:top;position:relative;top:1px;margin-left:4px;letter-spacing:.02em}
 .tile.l1{padding:5px 7px 5px 6px;align-items:flex-start}
 .tile .t1{width:100%;min-width:0;font:400 13px/1.25 Newsreader,Georgia,serif;overflow-wrap:anywhere}
-.tile.l2,.tile.l3{flex-direction:column;align-items:stretch;justify-content:flex-start;padding:7px 9px 7px 8px;gap:4px}
-.tile .t2{font:400 14px/1.25 Newsreader,Georgia,serif}
-.tile.l3 .t2{font-size:15.5px}
-.tile .x{font-size:11.5px;line-height:1.35;color:var(--ink-2);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.tile .ft{font:400 10.5px/1 "IBM Plex Mono",monospace;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:auto}
 .tile.l1:hover{z-index:2}
 .mini{position:absolute;right:14px;bottom:14px;width:240px;height:76px;border:1px solid color-mix(in oklab,var(--rule) 75%,var(--accent));border-radius:5px;background:var(--scrim);backdrop-filter:blur(6px);z-index:5;overflow:hidden;cursor:crosshair}
 .mini canvas{position:absolute;inset:0;width:100%;height:100%}
 .mini .mr{position:absolute;border:1.5px solid var(--accent-strong);border-radius:2px;background:var(--accent-soft);pointer-events:none}
-.status{display:none}
-.status b{color:var(--ink);font-weight:500}
-.status .kb{color:var(--ink-3);font-weight:400;margin-top:4px}
 #tip{position:fixed;pointer-events:none;z-index:9;background:var(--ink);color:var(--surface);border:1px solid color-mix(in oklab,var(--accent) 55%,var(--ink));border-radius:5px;padding:8px 11px;max-width:320px;font-size:13px;line-height:1.35;box-shadow:0 6px 24px rgba(0,0,0,.18)}
 #tip .m{font:500 12px/1 "IBM Plex Mono",monospace;opacity:.75;margin-bottom:5px}
-#tip .t{font:400 15px/1.3 Newsreader,Georgia,serif}
-#tip .g{opacity:.7;font-size:12px;margin-top:5px}
+#tip .t{font:400 15px/1.3 Newsreader,Georgia,serif;margin-bottom:5px}
+#tip .g{opacity:.7;font-size:12px}
 .reader{display:none;position:fixed;z-index:12;right:0;top:0;width:var(--reader-w);height:100vh;height:100dvh;min-height:0;border-left:1px solid color-mix(in oklab,var(--rule) 82%,var(--accent));overflow:visible;background:var(--surface)}
 .reader.open{display:block}
 .workspace.reader-open .mini{right:calc(var(--reader-w) + 14px)}
@@ -155,7 +142,7 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);o
 @keyframes reader-spin{to{transform:rotate(360deg)}}
 @keyframes reader-progress{0%{transform:translateX(-110%)}55%{transform:translateX(150%)}100%{transform:translateX(300%)}}
 @media (prefers-reduced-motion:reduce){.world.settling,.tile.settling,.tile{transition:none}.reader.loading .reader-body::after{animation:none;transform:none;width:100%}}
-@media (max-width:760px){.mini{display:none}.status{max-width:80vw}.reader{inset:0 0 0 auto;width:100vw;z-index:20;box-shadow:none}#reader-close{left:auto;right:10px;top:8px;transform:none}body.reader-open .controls,body.reader-open .tag-panel{margin-right:0}}
+@media (max-width:760px){.mini{display:none}.reader{inset:0 0 0 auto;width:100vw;z-index:20;box-shadow:none}#reader-close{left:auto;right:10px;top:8px;transform:none}body.reader-open .controls,body.reader-open .tag-panel{margin-right:0}}
 </style>
 
 <div class="wrap">
@@ -177,10 +164,9 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);o
     <div class="zui" id="zui" tabindex="0" aria-label="Zoomable lanes of word vomits">
       <div class="axis" id="axis"></div>
       <div class="corner" id="sticky-year" aria-hidden="true"></div>
-      <div class="viewport" id="vp"><div class="vlines" id="vlines"></div><div class="world" id="world"></div><i class="pan-edge left"></i><i class="pan-edge right"></i><i class="pan-edge top"></i><i class="pan-edge bottom"></i></div>
+      <div class="viewport" id="vp"><div class="vlines" id="vlines"></div><div class="world" id="world"></div><i class="pan-edge left"></i><i class="pan-edge right"></i></div>
       <div class="labels" id="labels"></div>
       <div class="mini" id="mini"><canvas></canvas><div class="mr"></div></div>
-      <div class="status" id="status"></div>
     </div>
     <aside class="reader" id="reader" aria-label="Article reader" aria-hidden="true">
       <button class="iconb" id="reader-close" aria-label="Close article reader">×</button>
@@ -208,10 +194,8 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const posts = RAW.posts.filter(p=>p[0]!=null).map(p=>({num:p[0],date:p[1],title:p[2],th:ORDER[MERGE[p[3]]],tags:p[4],slug:p[5],nums:(p[6]&&p[6].length?p[6]:[p[0]]),ex:p[7]||''})).sort((a,b)=>a.num-b.num);
 const N = posts.length; posts.forEach((p,i)=>p.i=i);
 const ms = d=>Date.parse(d+"T00:00:00Z"); const T0 = Math.min(...posts.map(p=>ms(p.date))), T1 = Math.max(...posts.map(p=>ms(p.date)));
-posts.forEach(p=>{ p.tIndex=p.i/(N-1); p.tDate=(ms(p.date)-T0)/(T1-T0); p.year=+p.date.slice(0,4); p.ms=ms(p.date); });
-const years=[...new Set(posts.map(p=>p.year))].sort(); const yearFirst={}; posts.forEach(p=>{ if(!(p.year in yearFirst)) yearFirst[p.year]=p; });
+posts.forEach(p=>{ p.tIndex=p.i/(N-1); p.tDate=(ms(p.date)-T0)/(T1-T0); p.year=+p.date.slice(0,4); });
 const counts=THEMES.map((_,d)=>posts.filter(p=>p.th===d).length);
-const spanOf=d=>{ const ys=posts.filter(p=>p.th===d).map(p=>p.year); return ys.length?`${Math.min(...ys)}–${Math.max(...ys)}`:''; };
 const byLane=THEMES.map((_,d)=>posts.filter(p=>p.th===d));
 
 
@@ -219,11 +203,11 @@ const byLane=THEMES.map((_,d)=>posts.filter(p=>p.th===d));
 let iso=null, activeTag=null, openPostIndex=null, mode='date';
 const LV=[
   {name:'Dots',    w:6,  h:6,  minW:6,   maxW:6,   pitch:8,   gap:2,  rg:2,  pad:5,  chrome:0},
-  {name:'Titles',  w:120,h:26, minW:88,  maxW:240, pitch:126, gap:8,  rg:6,  pad:10, chrome:16, font:'13px Newsreader, Georgia, serif', lh:16.25, maxLines:99, base:10},
+  {name:'Titles',  w:120,h:26, minW:88,  maxW:240, pitch:126, gap:8,  rg:6,  pad:10, chrome:16, font:'13px Newsreader, Georgia, serif'},
 ];
 // ---- text measurement: pretext if it loads, canvas fallback otherwise ----
 let PT=null; try{ PT=await import('https://cdn.jsdelivr.net/npm/@chenglou/pretext@0.0.8/dist/layout.js'); }catch(e){ console.warn('pretext unavailable, using canvas measurer', e); }
-try{ await document.fonts.ready; await Promise.all(['13px Newsreader','14px Newsreader','15.5px Newsreader','12px "IBM Plex Sans"','11.5px "IBM Plex Sans"','500 9px "IBM Plex Mono"','500 10px "IBM Plex Mono"'].map(f=>document.fonts.load(f))); }catch(e){}
+try{ await document.fonts.ready; await Promise.all(['13px Newsreader','500 9px "IBM Plex Mono"','500 11px "IBM Plex Sans"'].map(f=>document.fonts.load(f))); }catch(e){}
 const mctx=document.createElement('canvas').getContext('2d');
 function textW(t,font){ mctx.font=font; return mctx.measureText(t).width; }
 const SUPW=textW('0000','500 9px "IBM Plex Mono", monospace')+4;
@@ -231,26 +215,28 @@ const SUPW=textW('0000','500 9px "IBM Plex Mono", monospace')+4;
 const LBW=THEMES.map(t=>Math.ceil(2+8+7+textW(t.toUpperCase(),'500 11px "IBM Plex Sans", system-ui, sans-serif')+t.length*0.66+12));
 function preparedTitle(p,font){ p.prep=p.prep||{}; const key=font+'|full-title'; return p.prep[key]||(p.prep[key]=PT?.prepare?.(`${p.title}\u00a0${pad(p.num)}`,font)); }
 function naturalTitleWidth(p,font){ const prep=preparedTitle(p,font); if(prep&&PT?.measureNaturalWidth) return PT.measureNaturalWidth(prep); return textW(p.title,font)+SUPW; }
-function lineCount(p,font,w,isEx,tail=0){ const text=isEx?p.ex:p.title;
-  if(!isEx){ const prep=preparedTitle(p,font); if(prep&&PT?.layout) return Math.max(1,PT.layout(prep,w,15).lineCount); }
-  mctx.font=font; const words=(isEx?text:`${text} ${pad(p.num)}`).split(/\s+/).filter(Boolean); let n=1,lw=0;
-  for(const wd of words){ const ww=mctx.measureText(wd+' ').width; if(lw+ww>w&&lw>0){ n++; lw=0; } lw+=ww; }
-  if(tail&&lw+tail>w) n++; return n; }
-function tileSize(p,L,w){ const lv=LV[L]; if(L===0) return [lv.w,lv.h]; const inner=w-lv.chrome; const lines=Math.min(lv.maxLines,lineCount(p,lv.font,inner,false,SUPW)); let h=lv.base+lines*lv.lh;
-  if(lv.exFont&&p.ex){ const ex=Math.min(lv.exMax,lineCount(p,lv.exFont,inner,true)); h+=ex*lv.exLh+4; } return [w,Math.round(h)]; }
 const sOf=L=>LV[L].pitch/LV[0].pitch; const TOP=LV.length-1; const HDR=26; const REV=true; // newest at the left
 const Z={L:0,k:1,tx:0,ty:0,U:100,lay:[],kTarget:1,ax:0,ay:0,zoomAnim:0,vw:0,vh:0,canvasW:0,canvasH:0,el:{},pool:[],lastX:null,lastY:null,snapT:0,settleT:0,settling:false,focusMaxY:0,focusMinY:null};
-const vp=document.getElementById('vp'), world=document.getElementById('world'), axis=document.getElementById('axis'), stickyYear=document.getElementById('sticky-year'), vlines=document.getElementById('vlines'), labels=document.getElementById('labels'), zui=document.getElementById('zui'), statusEl=document.getElementById('status'), tip=document.getElementById('tip');
+const vp=document.getElementById('vp'), world=document.getElementById('world'), axis=document.getElementById('axis'), stickyYear=document.getElementById('sticky-year'), vlines=document.getElementById('vlines'), labels=document.getElementById('labels'), zui=document.getElementById('zui'), tip=document.getElementById('tip');
 const mini=document.getElementById('mini'), miniC=mini.querySelector('canvas'), miniR=mini.querySelector('.mr');
 const reader=document.getElementById('reader'), readerFrame=document.getElementById('reader-frame');
 let readerLoadStarted=0, readerLoadTimer=0, revealAnim=0;
 
 // ---------- layout ----------
 function computeUnits(){ Z.vw=vp.clientWidth; Z.vh=vp.clientHeight; Z.U=Math.max(20, Z.vw/LV[0].pitch);
-  const tOf=p=>mode==='index'?p.tIndex:p.tDate; posts.forEach(p=>{ const t=tOf(p); p.u=(REV?1-t:t)*(Z.U-1); p.pos=p.pos||[]; p.w=p.w||[]; p.h=p.h||[]; }); Z.bounds=null;
+  const tOf=p=>mode==='index'?p.tIndex:p.tDate; posts.forEach(p=>{ const t=tOf(p); p.u=(REV?1-t:t)*(Z.U-1); p.pos=p.pos||[]; p.w=p.w||[]; p.h=p.h||[]; }); Z.marks=null;
   Z.lay=LV.map((lv,L)=>layoutLevel(L)); }
 // Each lane is packed on top of the bottom envelope of the lane above, column by column, so lanes hug their content.
 const THIN=8;
+// Ribbon boundaries: a wide running maximum keeps every card inside its lane, and
+// the narrower running mean that follows turns the column staircase into a curve.
+// The mean window must stay narrower than the maximum window, or the curve could
+// dip below a card at the edge of a stack.
+const RIB_MAX=5, RIB_AVG=4;
+function ribbonEnvelope(NF,C){ const M=new Float64Array(C), S=new Float64Array(C);
+  for(let c=0;c<C;c++){ let m=0; for(let i=Math.max(0,c-RIB_MAX);i<=Math.min(C-1,c+RIB_MAX);i++) if(NF[i]>m) m=NF[i]; M[c]=m; }
+  for(let c=0;c<C;c++){ let s=0,n=0; for(let i=Math.max(0,c-RIB_AVG);i<=Math.min(C-1,c+RIB_AVG);i++){ s+=M[i]; n++; } S[c]=s/n; }
+  return S; }
 function measureTitleTiles(lv){
   const host=document.createElement('div'); host.style.cssText='position:fixed;left:-20000px;top:0;visibility:hidden;pointer-events:none;width:1000px'; const probes=[];
   for(const p of posts){ const natural=Math.ceil(naturalTitleWidth(p,lv.font)+lv.chrome), w=clamp(natural,lv.minW,lv.maxW), tile=document.createElement('div'), title=document.createElement('div'), sup=document.createElement('sup');
@@ -267,10 +253,11 @@ function layoutLevel(L,extra=0){ const lv=LV[L], grid=L===1?24:lv.pitch, C=Math.
       const ov=placed.filter(r=>r.x<x+w&&r.x+r.w>x); const cands=[base,...ov.map(r=>r.y+r.h).filter(v=>v>=base)].sort((a,b)=>a-b); let y=base; for(const c of cands){ if(!ov.some(r=>r.y<c+h&&r.y+r.h>c)){ y=c; break; } }
       placed.push({x,y,w,h,p}); p.pos[L]=[x,y]; if(colBot){ const bt=y+p.h[L]; for(let c=c0;c<=c1;c++) if(bt>colBot[c]) colBot[c]=bt; } if(x+p.w[L]>Wmax) Wmax=x+p.w[L]; } return placed; };
   for(let d=0;d<K;d++){ bounds.push(F); const NF=new Float64Array(C), colBot=new Float64Array(C), raise=new Float64Array(C); let bandTop=Infinity, bandBot=0;
-    const ps=[...byLane[d]].sort((a,b)=>a.u-b.u), n=ps.length;
-    // Title tiles are sized by their contents. Their width should not imply a
-    // duration or stretch merely because the next post happens to be far away.
-    if(L===0) for(let i=0;i<n;i++){ const p=ps[i]; [p.w[L],p.h[L]]=tileSize(p,L,lv.w); }
+    const ps=[...byLane[d]].sort((a,b)=>a.u-b.u);
+    // Dots share one size. Title tiles were measured from their contents above;
+    // their width should not imply a duration or stretch merely because the
+    // next post happens to be far away.
+    if(L===0) for(const p of ps){ p.w[L]=lv.w; p.h[L]=lv.h; }
     // content runs: contiguous columns covered by tiles. Each run gets a label at its start, and the band under the label is flattened so it sits clear of the lane above.
     const covered=new Uint8Array(C); for(const p of ps){ const c0=colOf(p.u*lv.pitch), c1=colOf(p.u*lv.pitch+p.w[L]+gx); for(let c=c0;c<=c1;c++) covered[c]=1; }
     const lr=[], lcols=Math.ceil((LBW[d]+12)/grid);
@@ -285,15 +272,16 @@ function layoutLevel(L,extra=0){ const lv=LV[L], grid=L===1?24:lv.pitch, C=Math.
     for(const r of lr){ const lb=r.m+extra/2+HDR; for(let c=r.c0;c<=r.span1;c++) if(lb>colBot[c]) colBot[c]=lb; }
     runs.push(lr.map(r=>({c0:r.c0,c1:r.c1,x:r.c0*grid+6,y:r.m+extra/2+(HDR-22)/2}))); bandTops.push(bt);
     for(let c=0;c<C;c++){ NF[c]=colBot[c]+lv.pad+extra/2; if(NF[c]>bandBot) bandBot=NF[c]; }
-    const SF=new Float64Array(C);
+    let SF;
     if(L===0){
       // Dots benefit from stable global rows: their small, regular marks can
       // show density inside a lane without moving the category itself.
-      SF.fill(bandBot);
+      SF=new Float64Array(C).fill(bandBot);
     }else{
       // Titles need local height. Reserving the worst card stack across the
-      // entire timeline would create vast empty gaps in every other period.
-      for(let c=0;c<C;c++) SF[c]=Math.max(NF[c],c>0?NF[c-1]:0,c<C-1?NF[c+1]:0);
+      // entire timeline would create vast empty gaps in every other period,
+      // while a boundary that hugs every card reads as a jagged staircase.
+      SF=ribbonEnvelope(NF,C);
     }
     bands.push({top:bandTop,bot:bandBot}); F=SF; }
   bounds.push(F); let H=0; for(let c=0;c<C;c++) if(F[c]>H) H=F[c];
@@ -306,14 +294,17 @@ function absToWorld(a,L){ const b=laneGeom(L).bands[a.lane]; return [a.u*LV[L].p
 function layoutWorld(){ const g=laneGeom(Z.L); Z.canvasW=g.W; Z.canvasH=g.H; world.style.width=g.W+'px'; world.style.height=g.H+'px';
   let svg=world.querySelector('svg.bounds'); if(!svg){ svg=document.createElementNS('http://www.w3.org/2000/svg','svg'); svg.setAttribute('class','bounds'); world.prepend(svg); }
   svg.setAttribute('width',g.W); svg.setAttribute('height',g.H); svg.setAttribute('viewBox',`0 0 ${g.W} ${g.H}`); let html='';
-  for(let d=0;d<K;d++){ const shapes=Z.L===1?[]:[{c0:0,c1:g.C-1,top:g.bounds[d],bot:g.bounds[d+1]}]; for(const s of shapes){ const top=stepRange(s.top,s.c0,s.c1,g.grid,g.W), bot=stepRange(s.bot,s.c0,s.c1,g.grid,g.W).reverse();
-      html+=`<path style="fill:${COLORS[d]}" d="M${[...top,...bot].map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join('L')}Z"/>`; } }
+  for(let d=0;d<K;d++) html+=`<path style="fill:${COLORS[d]}" d="${ribbonD(d,g)}"/>`;
   svg.innerHTML=html;
   // one label per content run, living in the world so it moves with its content
   world.querySelectorAll('.wl').forEach(e=>e.remove());
   for(let d=0;d<K;d++){ for(const r of g.runs[d]){ const el=document.createElement('div'); el.className='pill wl'; el.style.setProperty('--c',COLORS[d]); el.style.left=r.x+'px'; el.style.top=r.y+'px'; el.style.opacity=0; el.innerHTML=`<i></i>${THEMES[d]}`; world.appendChild(el); r.el=el; } } }
-function stepPts(F,C,pitch,W){ const pts=[[0,F[0]]]; for(let c=0;c<C-1;c++){ if(F[c+1]!==F[c]){ pts.push([(c+1)*pitch,F[c]],[(c+1)*pitch,F[c+1]]); } } pts.push([W,F[C-1]]); return pts; }
-function stepRange(F,c0,c1,pitch,W){ const x0=Math.min(W,c0*pitch), pts=[[x0,F[c0]]]; for(let c=c0;c<c1;c++){ const x=Math.min(W,(c+1)*pitch); if(F[c+1]!==F[c]) pts.push([x,F[c]],[x,F[c+1]]); } pts.push([Math.min(W,(c1+1)*pitch),F[c1]]); return pts; }
+// A lane's tint is the region between two envelopes. Samples sit at column
+// centres and are joined by quadratic curves through their midpoints, which
+// never overshoot the sampled values, so the tint stays clear of the cards.
+function envelopePts(F,g){ const last=clamp(Math.floor(g.W/g.grid),0,g.C-1), pts=[[0,F[0]]]; for(let c=0;c<=last;c++){ const x=(c+.5)*g.grid; if(x>=g.W) break; pts.push([x,F[c]]); } pts.push([g.W,F[last]]); return pts; }
+function curveD(pts){ const f=v=>v.toFixed(1); let d=`L${f(pts[0][0])} ${f(pts[0][1])}`; for(let i=1;i<pts.length-1;i++){ const [x,y]=pts[i], [x1,y1]=pts[i+1]; d+=`Q${f(x)} ${f(y)} ${f((x+x1)/2)} ${f((y+y1)/2)}`; } const e=pts[pts.length-1]; return d+`L${f(e[0])} ${f(e[1])}`; }
+function ribbonD(d,g){ const top=envelopePts(g.bounds[d],g), bot=envelopePts(g.bounds[d+1],g).reverse(); return 'M'+curveD(top).slice(1)+curveD(bot)+'Z'; }
 function readerOcclusionInset(){
   if(!reader.classList.contains('open')) return 0;
   const vr=vp.getBoundingClientRect(), rr=reader.getBoundingClientRect();
@@ -329,28 +320,22 @@ function clampPan(){ const cw=Z.canvasW*Z.k, inset=readerInset(), usableW=Z.vw-i
   // its focused item. Ordinary panning cannot travel any farther into that space.
   const baseMinY=Math.min(0,Z.vh-ch), minY=Math.min(baseMinY,Z.focusMinY??baseMinY), maxY=Math.max(0,Z.focusMaxY||0), eps=1; Z.ty=clamp(Z.ty,minY,maxY);
   if(Z.ty<=eps) Z.focusMaxY=0; if(Z.ty>=baseMinY-eps) Z.focusMinY=null;
-  zui.classList.toggle('can-pan-left',Z.tx<maxX-eps); zui.classList.toggle('can-pan-right',Z.tx>minX+eps);
-  // Cues describe real content beyond the viewport, not the centering padding.
-  zui.classList.toggle('can-pan-up',Z.ty<-eps); zui.classList.toggle('can-pan-down',Z.ty+ch>Z.vh+eps); zui.style.setProperty('--pan-right-inset',readerOcclusionInset()+'px'); }
+  zui.classList.toggle('can-pan-left',Z.tx<maxX-eps); zui.classList.toggle('can-pan-right',Z.tx>minX+eps); zui.style.setProperty('--pan-right-inset',readerOcclusionInset()+'px'); }
 function applyCamera(){ world.style.transform=`translate(${Z.tx.toFixed(2)}px,${Z.ty.toFixed(2)}px) scale(${Z.k})`; renderAxis(); renderGutter(); renderMini(); }
 
 // ---------- tiles ----------
-function tileHTML(p,L){ if(L===0) return '';
-  const t=`${esc(p.title)}<sup>${pad(p.num)}</sup>`;
-  if(L===1) return `<div class="t1">${t}</div>`;
-  if(L===2) return `<div class="t2">${t}</div><div class="ft">${p.date}</div>`;
-  return `<div class="t2">${t}</div>${p.ex?`<div class="x">${esc(p.ex)}</div>`:''}<div class="ft">${p.date}${p.tags.length?' · '+esc(p.tags.join(' · ')):''}</div>`; }
+function tileHTML(p,L){ return L===0?'':`<div class="t1">${esc(p.title)}<sup>${pad(p.num)}</sup></div>`; }
 function place(el,p,L){ const [x,y]=tilePos(p,L); el.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`; el.style.width=p.w[L]+'px'; el.style.height=p.h[L]+'px'; }
 function isFiltered(p){ return (iso!=null&&p.th!==iso)||(activeTag!=null&&!p.tags.includes(activeTag)); }
 function mount(p,L,enter){ let el=Z.el[p.i]; if(!el){ el=Z.pool.pop()||document.createElement('div'); el.dataset.i=p.i; el.style.setProperty('--c',COLORS[p.th]); el.dataset.l=''; el.className='tile'; world.appendChild(el); Z.el[p.i]=el; if(enter&&!reduced){ el.classList.add('enter'); requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.remove('enter'))); } }
-  if(el.dataset.l!==String(L)){ el.dataset.l=L; el.classList.remove('l0','l1','l2','l3'); el.classList.add('l'+L); el.innerHTML=tileHTML(p,L); }
+  if(el.dataset.l!==String(L)){ el.dataset.l=L; el.classList.remove('l0','l1'); el.classList.add('l'+L); el.innerHTML=tileHTML(p,L); }
   el.classList.toggle('dim',isFiltered(p)); el.classList.toggle('open',p.i===openPostIndex); if(Z.settling) el.classList.add('settling'); else el.classList.remove('settling'); place(el,p,L); }
 function unmount(i){ const el=Z.el[i]; if(!el) return; el.remove(); el.className='tile'; el.dataset.l=''; delete Z.el[i]; Z.pool.push(el); }
 function visibleSet(L,margin=160){ const x0=(-Z.tx)/Z.k-margin, x1=(-Z.tx+Z.vw)/Z.k+margin, y0=(-Z.ty)/Z.k-margin, y1=(-Z.ty+Z.vh)/Z.k+margin; const lv=LV[L]; const out=[];
   for(const p of posts){ const [x,y]=tilePos(p,L); if(x+p.w[L]<x0||x>x1||y+p.h[L]<y0||y>y1) continue; out.push(p); } return out; }
 function sync(force){ const L=Z.L; const all=L===0; const vis = all ? posts : visibleSet(L); const keep=new Set(vis.map(p=>p.i));
   if(!Z.settling){ for(const i in Z.el){ if(!keep.has(+i)) unmount(+i); } }
-  for(const p of vis){ if(!Z.el[p.i]||force) mount(p,L,!all&&!force); } renderStatus(vis); }
+  for(const p of vis){ if(!Z.el[p.i]||force) mount(p,L,!all&&!force); } }
 
 // ---------- level changes ----------
 function goLevel(L2,ax,ay,centerVertical=false,focusPost=null,allowEdgePadding=false){ L2=clamp(L2,0,TOP); if(ax==null){ax=Z.vw/2;ay=Z.vh/2;} const L1=Z.L; if(L2===L1&&Math.abs(Z.k-1)<1e-6) return;
@@ -363,45 +348,58 @@ function goLevel(L2,ax,ay,centerVertical=false,focusPost=null,allowEdgePadding=f
   else { Z.focusMaxY=0; Z.focusMinY=null; }
   layoutWorld(); clampPan(); Z.settling=false; world.classList.remove('settling'); applyCamera(); sync(true);
   if(!reduced){
-    const duration=300, ease='cubic-bezier(.22,.61,.36,1)';
+    const duration=300, ease='cubic-bezier(.22,.61,.36,1)', fresh=[];
     for(const [i,el] of Object.entries(Z.el)){ const nr=el.getBoundingClientRect(); if(nr.right<vr.left-40||nr.left>vr.right+40||nr.bottom<vr.top-40||nr.top>vr.bottom+40) continue;
       const p=posts[+i], [x,y]=tilePos(p,L2), or=oldRects.get(+i), finalTransform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
       el.getAnimations().forEach(anim=>anim.cancel());
       if(or){ const dx=(or.left-nr.left)/Z.k, dy=(or.top-nr.top)/Z.k, sx=Math.max(.04,or.width/nr.width), sy=Math.max(.04,or.height/nr.height);
         el.animate([{transform:`translate(${(x+dx).toFixed(1)}px,${(y+dy).toFixed(1)}px) scale(${sx},${sy})`},{transform:finalTransform}],{duration,easing:ease,fill:'none'});
-      } else el.animate([{opacity:0},{opacity:getComputedStyle(el).opacity}],{duration:240,easing:'ease-out'});
+      } else fresh.push(el);
     }
+    // Fading in several hundred dots gives each one its own compositor layer for the
+    // length of the fade, which stalled the first frame at the new level for ~250ms.
+    // Past a modest count the fade is not worth that, and the dots simply appear.
+    if(fresh.length<=120) for(const el of fresh) el.animate([{opacity:0},{opacity:getComputedStyle(el).opacity}],{duration:240,easing:'ease-out'});
     Z.settling=true; clearTimeout(Z.settleT); Z.settleT=setTimeout(()=>{ Z.settling=false; sync(); },duration+20);
   }
   updateLevelUI(); writeHash(); }
 function killSettle(){ clearTimeout(Z.settleT); if(Z.settling){ Z.settling=false; world.classList.remove('settling'); document.querySelectorAll('.tile').forEach(e=>{ e.classList.remove('settling'); e.getAnimations().forEach(anim=>anim.cancel()); }); sync(); } }
-function zoomBy(f,ax,ay){ const e=Z.k*sOf(Z.L), e2=e*f; if(e2<1||e2>sOf(TOP)*1.35) return; const wx=(ax-Z.tx)/Z.k, wy=(ay-Z.ty)/Z.k; Z.k*=f; Z.kTarget=Z.k; Z.tx=ax-wx*Z.k; Z.ty=ay-wy*Z.k; clampPan(); applyCamera(); sync(); }
-function zoomToward(f,ax,ay){ const lo=1/sOf(Z.L), hi=sOf(TOP)*1.35/sOf(Z.L); Z.kTarget=clamp((Z.kTarget||Z.k)*f,lo,hi); Z.ax=ax; Z.ay=ay; if(!Z.zoomAnim) Z.zoomAnim=requestAnimationFrame(zoomStep); }
+// Semantic zoom thresholds: past UP the dots become titles, below DOWN titles become dots.
+// Crossing one mid-gesture switches level at once. Waiting for the gesture to end left the
+// dots swelling to several times their size for half a second before anything happened.
+const UP=1.35, DOWN=0.78;
+function crossedLevel(){ return (Z.L===0&&Z.k>=UP)||(Z.L===TOP&&Z.k<=DOWN); }
+function zoomBy(f,ax,ay){ const e=Z.k*sOf(Z.L), e2=e*f; if(e2<1||e2>sOf(TOP)*UP) return; const wx=(ax-Z.tx)/Z.k, wy=(ay-Z.ty)/Z.k; Z.k*=f; Z.kTarget=Z.k; Z.tx=ax-wx*Z.k; Z.ty=ay-wy*Z.k; clampPan(); applyCamera(); sync(); if(crossedLevel()) snap(); }
+function zoomToward(f,ax,ay){ const lo=1/sOf(Z.L), hi=sOf(TOP)*UP/sOf(Z.L); Z.kTarget=clamp((Z.kTarget||Z.k)*f,lo,hi); Z.ax=ax; Z.ay=ay; if(!Z.zoomAnim) Z.zoomAnim=requestAnimationFrame(zoomStep); }
 function zoomStep(){ Z.zoomAnim=0; const d=Z.kTarget-Z.k; if(Math.abs(d)<0.0015){ if(Z.k!==Z.kTarget){ const wx=(Z.ax-Z.tx)/Z.k, wy=(Z.ay-Z.ty)/Z.k; Z.k=Z.kTarget; Z.tx=Z.ax-wx*Z.k; Z.ty=Z.ay-wy*Z.k; clampPan(); applyCamera(); sync(); } return; }
-  const k2=Z.k+d*(reduced?1:0.22); const wx=(Z.ax-Z.tx)/Z.k, wy=(Z.ay-Z.ty)/Z.k; Z.k=k2; Z.tx=Z.ax-wx*Z.k; Z.ty=Z.ay-wy*Z.k; clampPan(); applyCamera(); sync(); Z.zoomAnim=requestAnimationFrame(zoomStep); }
+  const k2=Z.k+d*(reduced?1:0.22); const wx=(Z.ax-Z.tx)/Z.k, wy=(Z.ay-Z.ty)/Z.k; Z.k=k2; Z.tx=Z.ax-wx*Z.k; Z.ty=Z.ay-wy*Z.k; clampPan(); applyCamera(); sync();
+  if(crossedLevel()){ snap(); return; }
+  Z.zoomAnim=requestAnimationFrame(zoomStep); }
 function scheduleSnap(){ clearTimeout(Z.snapT); Z.snapT=setTimeout(snap,460); }
 function clearFocusPadding(){ if(!Z.focusMaxY&&Z.focusMinY==null) return; Z.focusMaxY=0; Z.focusMinY=null; clampPan(); applyCamera(); sync(); }
 function nearestTileAt(x,y,maxDistance=90){ const vr=vp.getBoundingClientRect(), cx=vr.left+x, cy=vr.top+y; let best=null, bestD=maxDistance*maxDistance; for(const [i,el] of Object.entries(Z.el)){ const r=el.getBoundingClientRect(), dx=(r.left+r.width/2)-cx, dy=(r.top+r.height/2)-cy, d=dx*dx+dy*dy; if(d<bestD){ bestD=d; best=posts[+i]; } } return best; }
-function snap(){ cancelAnimationFrame(Z.zoomAnim); Z.zoomAnim=0; Z.k=Z.kTarget||Z.k; const from=Z.L; let target=from; if(from===0&&Z.k>=1.35) target=1; else if(from===1&&Z.k<=0.78) target=0;
+function snap(){ cancelAnimationFrame(Z.zoomAnim); Z.zoomAnim=0; clearTimeout(Z.snapT); if(crossedLevel()) Z.kTarget=Z.k; Z.k=Z.kTarget||Z.k; const from=Z.L; let target=from; if(from===0&&Z.k>=UP) target=1; else if(from===1&&Z.k<=DOWN) target=0;
   // A gesture that stops between semantic levels is still a valid zoom. Keep that
   // exact scale instead of snapping the current level back to 1x.
   if(target===from){ Z.kTarget=Z.k; clampPan(); applyCamera(); sync(); writeHash(); return; }
   const x=Z.lastX??Z.vw/2,y=Z.lastY??Z.vh/2; goLevel(target,x,y,true,nearestTileAt(x,y)); }
-function updateLevelUI(){ [...document.getElementById('levels').children].forEach((b,i)=>b.setAttribute('aria-pressed',String(i===Z.L))); }
+function updateLevelUI(){ [...document.getElementById('levels').children].forEach((b,i)=>b.setAttribute('aria-pressed',String(i===Z.L))); zui.classList.toggle('titles',Z.L===1); updateHint(); }
 
 // ---------- furniture ----------
 function renderAxis(){ const e=Z.k*LV[Z.L].pitch; axis.innerHTML=''; vlines.innerHTML=''; const frag=document.createDocumentFragment(), vf=document.createDocumentFragment(); const u0=(-Z.tx)/e, u1=(-Z.tx+Z.vw)/e;
   const leftU=clamp(u0,0,Z.U-1), leftT=REV?1-leftU/(Z.U-1):leftU/(Z.U-1);
   stickyYear.textContent=mode==='date'?String(new Date(T0+leftT*(T1-T0)).getUTCFullYear()):String(posts[clamp(Math.round(leftT*(N-1)),0,N-1)].year);
-  const mk=(u,label,cls='')=>{ const x=Z.tx+u*e; if(x<-60||x>Z.vw+60) return; const d=document.createElement('div'); d.className='tk'+(cls?' '+cls:''); d.style.left=x+'px'; if(label){ const s=document.createElement('span'); s.textContent=label; d.appendChild(s);} frag.appendChild(d); const l=document.createElement('div'); l.className=cls.includes('minor')?'':'major'; l.style.left=x+'px'; vf.appendChild(l); };
+  // The sticky year sits over the left end of the axis; a tick label under it would collide.
+  const cornerW=stickyYear.offsetWidth;
+  const mk=(u,label,cls='')=>{ const x=Z.tx+u*e; if(x<-60||x>Z.vw+60) return; if(label&&x<(cls.includes('left')?cornerW+40:cornerW+4)) label=''; const d=document.createElement('div'); d.className='tk'+(cls?' '+cls:''); d.style.left=x+'px'; if(label){ const s=document.createElement('span'); s.textContent=label; d.appendChild(s);} frag.appendChild(d); const l=document.createElement('div'); l.className=cls.includes('minor')?'':'major'; l.style.left=x+'px'; vf.appendChild(l); };
   if(mode==='index'){ // year and month boundaries located at the first post of each year / month
-    if(!Z.bounds){ Z.bounds=[]; let pm=''; for(const p of [...posts].sort((a,b)=>a.u-b.u)){ const ym=p.date.slice(0,7); if(ym!==pm){ Z.bounds.push({p,ym,year:pm===''||pm.slice(0,4)!==ym.slice(0,4)}); pm=ym; } } }
+    if(!Z.marks){ Z.marks=[]; let pm=''; for(const p of [...posts].sort((a,b)=>a.u-b.u)){ const ym=p.date.slice(0,7); if(ym!==pm){ Z.marks.push({p,ym,year:pm===''||pm.slice(0,4)!==ym.slice(0,4)}); pm=ym; } } }
     const pxPerPost=e*(Z.U-1)/(N-1); const showMonths = pxPerPost*12>=60; const MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
     // Equal-per-post spacing can place several sparse years only a few pixels
     // apart. Preserve every boundary, but thin labels according to screen space.
     // More labels naturally return as the user zooms in.
     let lastLabelX=-1e9;
-    for(const b of Z.bounds){ if(!b.year&&!showMonths) continue; const x=Z.tx+b.p.u*e; if(x<-60||x>Z.vw+60) continue;
+    for(const b of Z.marks){ if(!b.year&&!showMonths) continue; const x=Z.tx+b.p.u*e; if(x<-60||x>Z.vw+60) continue;
       const label=b.year?b.ym.slice(0,4):MN[+b.ym.slice(5)-1], minGap=b.year?48:44;
       if(x-lastLabelX<minGap){ if(b.year) mk(b.p.u,''); continue; }
       lastLabelX=x; mk(b.p.u,label,b.year?'':'minor'); }
@@ -415,14 +413,36 @@ function renderAxis(){ const e=Z.k*LV[Z.L].pitch; axis.innerHTML=''; vlines.inne
       if(unit==='year') d=new Date(Date.UTC(y+1,0,1)); else if(unit==='quarter') d=new Date(Date.UTC(y,m+3,1)); else if(unit==='month') d=new Date(Date.UTC(y,m+1,1)); else if(unit==='week') d=new Date(d.getTime()+7*86400000); else d=new Date(d.getTime()+86400000); } }
   axis.appendChild(frag); vlines.appendChild(vf); }
 // Sticky copies of the run labels: one fades in at the left edge only while its run's own label has scrolled off to the left, and fades out again when the run ends.
-function renderGutter(){ const g=laneGeom(Z.L); if(!labels.children.length){ for(let d=0;d<K;d++){ const lb=document.createElement('div'); lb.className='pill lb'; lb.style.setProperty('--c',COLORS[d]); lb.innerHTML=`<i></i>${THEMES[d]}`; lb.style.opacity=0; lb._vis=false; labels.appendChild(lb); } }
-  const worldLeft=(-Z.tx+8)/Z.k, cFloat=clamp(worldLeft/g.grid,0,g.C-1), cL=Math.floor(cFloat);
+// Lanes with no part of their ribbon on screen dock at the edge they left through, so the categories beyond the viewport stay named and one click away.
+const G={sticky:[],up:[],down:[]};
+function buildGutter(){
+  for(let d=0;d<K;d++){ const lb=document.createElement('div'); lb.className='pill lb'; lb.style.setProperty('--c',COLORS[d]); lb.innerHTML=`<i></i>${THEMES[d]}`; lb.style.opacity=0; lb._vis=false; labels.appendChild(lb); G.sticky.push(lb); }
+  for(const [key,cls,caret] of [['up','top','▴'],['down','bottom','▾']]){ const dock=document.createElement('div'); dock.className='dock '+cls; labels.appendChild(dock);
+    for(let d=0;d<K;d++){ const b=document.createElement('button'); b.type='button'; b.className='pill dk'; b.hidden=true; b.style.setProperty('--c',COLORS[d]); b.innerHTML=`<span class="caret">${caret}</span><i></i>${THEMES[d]}<span class="ct"></span>`; b.setAttribute('aria-label',`Scroll to ${THEMES[d]}`); b.onclick=()=>panToLane(d); dock.appendChild(b); G[key].push(b); } } }
+// The gutter judges everything at the left edge, where the labels live. A label footprint spans a few columns, so sample the highest boundary under all of them.
+const leftColF=g=>clamp((-Z.tx+8)/Z.k/g.grid,0,g.C-1);
+function labelTopAt(g,d,c){ const span=Math.max(1,Math.ceil(LBW[d]/g.grid)); let y=0; for(let i=c;i<=Math.min(g.C-1,c+span);i++) if(g.bandTops[d][i]>y) y=g.bandTops[d][i]; return y+(HDR-22)/2; }
+function animatePanY(ty){ cancelAnimationFrame(inertia); cancelAnimationFrame(revealAnim); killSettle(); const start=Z.ty, began=performance.now(), duration=reduced?0:320;
+  const step=now=>{ const t=duration?Math.min(1,(now-began)/duration):1, e=1-Math.pow(1-t,3); Z.ty=start+(ty-start)*e; clampPan(); applyCamera(); sync(); if(t<1) revealAnim=requestAnimationFrame(step); }; revealAnim=requestAnimationFrame(step); }
+// Bring the lane's label to rest just under the axis, exactly where its sticky copy will then sit.
+function panToLane(d){ const g=laneGeom(Z.L); animatePanY(6-labelTopAt(g,d,Math.floor(leftColF(g)))*Z.k); }
+function renderGutter(){ const g=laneGeom(Z.L); if(!G.sticky.length) buildGutter();
+  const cFloat=leftColF(g), cL=Math.floor(cFloat), x0=(-Z.tx)/Z.k, x1=x0+Z.vw/Z.k;
+  // Dock pass first: the stacks decide how much of the left edge sticky labels may use.
+  // A ribbon that only peeks in further right still has no label of its own on screen, so it docks too.
+  let nUp=0, nDown=0;
+  // A lane whose own run label is on screen further right is already named there, so it stays out of the dock.
+  const labelOnScreen=d=>{ const r=g.runs[d].find(r=>{ const sx=Z.tx+r.x*Z.k, ex=Z.tx+(r.c1+1)*g.grid*Z.k; return ex>0 && sx>=8 && sx<Z.vw; }); if(!r) return false; const ys=Z.ty+r.y*Z.k; return ys>=0 && ys<=Z.vh-22; };
+  for(let d=0;d<K;d++){ const above=Z.ty+g.bounds[d+1][cL]*Z.k<0, below=Z.ty+g.bounds[d][cL]*Z.k>Z.vh, dock=(above||below)&&!labelOnScreen(d);
+    if(dock){ let n=0; for(const p of byLane[d]){ const x=p.pos[Z.L][0]; if(x+p.w[Z.L]>x0&&x<x1&&!isFiltered(p)) n++; } const b=above?G.up[d]:G.down[d], ct=n?String(n):''; if(b._ct!==ct){ b._ct=ct; b.lastElementChild.textContent=ct; } }
+    G.up[d].hidden=!(dock&&above); G.down[d].hidden=!(dock&&below); if(dock&&above) nUp++; if(dock&&below) nDown++; }
+  const topPad=nUp?nUp*21+8:4, botPad=nDown?nDown*21+10:0;
   // A sticky label occupies several layout columns. Sample the highest local
   // boundary under that whole footprint, then interpolate between columns so
   // panning moves the label continuously instead of making it jump in 24px steps.
-  const localLabelTop=d=>{ const span=Math.max(1,Math.ceil(LBW[d]/g.grid)), sample=c=>{ let y=0; for(let i=c;i<=Math.min(g.C-1,c+span);i++) if(g.bandTops[d][i]>y) y=g.bandTops[d][i]; return y; }, a=sample(cL), b=sample(Math.min(g.C-1,cL+1)); return a+(b-a)*(cFloat-cL)+(HDR-22)/2; };
-  for(let d=0;d<K;d++){ const lb=labels.children[d]; const runs=g.runs[d]; const run=runs.find(r=>r.c0<=cL&&cL<=r.c1); let show=false, y=0;
-    if(run){ const ownX=Z.tx+run.x*Z.k, endX=Z.tx+(run.c1+1)*g.grid*Z.k, bot=Z.ty+g.bounds[d+1][cL]*Z.k; y=Z.ty+localLabelTop(d)*Z.k; if(y<4) y=Math.min(4,bot-26); show = ownX<8 && endX>=8+LBW[d] && bot>26 && y<Z.vh; }
+  const localLabelTop=d=>{ const a=labelTopAt(g,d,cL), b=labelTopAt(g,d,Math.min(g.C-1,cL+1)); return a+(b-a)*(cFloat-cL); };
+  for(let d=0;d<K;d++){ const lb=G.sticky[d]; const runs=g.runs[d]; const run=runs.find(r=>r.c0<=cL&&cL<=r.c1); let show=false, y=0;
+    if(run){ const ownX=Z.tx+run.x*Z.k, endX=Z.tx+(run.c1+1)*g.grid*Z.k, bot=Z.ty+g.bounds[d+1][cL]*Z.k; y=Z.ty+localLabelTop(d)*Z.k; if(y<topPad) y=Math.min(topPad,bot-26); show = ownX<8 && endX>=8+LBW[d] && bot>topPad+22 && y<Z.vh-botPad-22; }
     const runKey=run?`${run.c0}:${run.c1}`:'';
     if(show){ lb.style.transform=`translate(8px,${y.toFixed(1)}px)`; lb.style.opacity=1; lb._vis=true; lb._runKey=runKey; }
     else if(lb._vis){ lb.style.opacity=0; lb._vis=false; lb._runKey=''; }
@@ -432,15 +452,10 @@ function renderGutter(){ const g=laneGeom(Z.L); if(!labels.children.length){ for
 // The minimap draws the layout of the level you are on, squeezed to its box, so the box maps to the canvas exactly.
 function renderMini(){ const W=mini.clientWidth,H=mini.clientHeight; if(!W) return; const L=Z.L, g=laneGeom(L); if(!g) return; const sx=W/g.W, sy=H/g.H; const c=miniC; if(c.width!==W*2||c.height!==H*2){ c.width=W*2; c.height=H*2; Z.miniDirty=true; }
   if(Z.miniDirty||Z.miniL!==L||Z.miniMode!==mode){ Z.miniDirty=false; Z.miniL=L; Z.miniMode=mode; const ctx=c.getContext('2d'); ctx.setTransform(2,0,0,2,0,0); ctx.clearRect(0,0,W,H); const cs=getComputedStyle(document.documentElement);
-    for(let d=0;d<K;d++){ const shapes=L===1?[]:[{c0:0,c1:g.C-1,top:g.bounds[d],bot:g.bounds[d+1]}]; for(const s of shapes){ const top=stepRange(s.top,s.c0,s.c1,g.grid,g.W), bot=stepRange(s.bot,s.c0,s.c1,g.grid,g.W).reverse(); ctx.beginPath(); [...top,...bot].forEach((q,i)=>i?ctx.lineTo(q[0]*sx,q[1]*sy):ctx.moveTo(q[0]*sx,q[1]*sy)); ctx.closePath(); ctx.fillStyle=cs.getPropertyValue(COLORS[d].slice(4,-1)).trim()||'#888'; ctx.globalAlpha=.14; ctx.fill(); } } ctx.globalAlpha=1;
+    ctx.save(); ctx.scale(sx,sy); ctx.globalAlpha=.14; for(let d=0;d<K;d++){ ctx.fillStyle=cs.getPropertyValue(COLORS[d].slice(4,-1)).trim()||'#888'; ctx.fill(new Path2D(ribbonD(d,g))); } ctx.restore();
     for(const p of posts){ const [x,y]=p.pos[L]; ctx.fillStyle=cs.getPropertyValue(COLORS[p.th].slice(4,-1)).trim()||'#888'; ctx.globalAlpha=isFiltered(p)?0.15:0.9; ctx.fillRect(x*sx,y*sy,Math.max(1,p.w[L]*sx),Math.max(1,p.h[L]*sy)); } ctx.globalAlpha=1; }
   const x0=(-Z.tx)/Z.k, y0=(-Z.ty)/Z.k, x1=x0+Z.vw/Z.k, y1=y0+Z.vh/Z.k;
   miniR.style.left=clamp(x0*sx,0,W)+'px'; miniR.style.top=clamp(y0*sy,0,H)+'px'; miniR.style.width=Math.max(4,clamp(x1*sx,0,W)-clamp(x0*sx,0,W))+'px'; miniR.style.height=Math.max(4,clamp(y1*sy,0,H)-clamp(y0*sy,0,H))+'px'; }
-function renderStatus(vis){ const e=Z.k*LV[Z.L].pitch; const u0=(-Z.tx)/e, u1=(-Z.tx+Z.vw)/e; const inX=posts.filter(p=>p.u>=u0&&p.u<=u1).sort((a,b)=>a.u-b.u); let range='';
-  if(inX.length){ const a=inX[0], b=inX[inX.length-1]; range=`<b>#${pad(a.num)}</b> – <b>#${pad(b.num)}</b> · ${a.date} – ${b.date}`; }
-  const hov = Z.hover ? `<div><b>#${pad(Z.hover.num)}</b> ${esc(Z.hover.title)}</div>` : '';
-  statusEl.innerHTML=`${hov}<div>${range} · ${LV[Z.L].name} · ${vis.length} tiles mounted</div><div class="kb">scroll to pan · ctrl-scroll or pinch to zoom · +/− step · 0 reset · double-click zooms in</div>`; }
-
 // ---------- input ----------
 const ptrs=new Map(); let drag=null, moved=false, vx=0, vy=0, inertia=0, pinchD=0;
 function rel(ev){ const r=vp.getBoundingClientRect(); return [ev.clientX-r.left, ev.clientY-r.top]; }
@@ -461,7 +476,7 @@ function openReader(p){
   // Opening the fixed reader changes the usable hover area before another
   // pointermove necessarily occurs. Remove the transient hover card instead of
   // leaving it stranded beneath the panel edge.
-  tip.hidden=true; Z.hover=null; document.querySelectorAll('.tile.hit').forEach(n=>n.classList.remove('hit'));
+  tip.hidden=true; document.querySelectorAll('.tile.hit').forEach(n=>n.classList.remove('hit'));
   const url=BASE+p.slug+'/';
   openPostIndex=p.i;
   for(const i in Z.el) Z.el[i].classList.toggle('open',+i===openPostIndex);
@@ -504,7 +519,9 @@ vp.addEventListener('wheel',ev=>{ const [x,y]=rel(ev); Z.lastX=x; Z.lastY=y;
   ev.preventDefault();
   let dx=ev.deltaX, dy=ev.deltaY; if(ev.shiftKey&&!dx){ dx=dy; dy=0; } if(ev.deltaMode===1){ dx*=16; dy*=16; }
   const tx=Z.tx, ty=Z.ty; Z.tx-=dx; Z.ty-=dy; clampPan(); if(Z.tx===tx&&Z.ty===ty){ return; } killSettle(); applyCamera(); sync(); },{passive:false});
-world.addEventListener('pointerover',ev=>{ const t=ev.target.closest('.tile'); if(!t) return; const p=posts[+t.dataset.i]; Z.hover=p; t.classList.add('hit'); if(Z.L<=1){ tip.hidden=false; tip.innerHTML=`<div class="m">#${pad(p.num)} · ${p.date}</div><div class="t">${esc(p.title)}</div><div class="g">${THEMES[p.th]}${p.tags.length?' · '+p.tags.join(', '):''}</div>`; } renderStatus(Object.keys(Z.el)); });
+// Title tiles already show their title, so the hover card only adds what the tile leaves out.
+world.addEventListener('pointerover',ev=>{ const t=ev.target.closest('.tile'); if(!t) return; const p=posts[+t.dataset.i]; t.classList.add('hit'); tip.hidden=false;
+  tip.innerHTML=`<div class="m">#${pad(p.num)} · ${p.date}</div>${Z.L===0?`<div class="t">${esc(p.title)}</div>`:''}<div class="g">${THEMES[p.th]}${p.tags.length?' · '+esc(p.tags.join(', ')):''}</div>`; });
 world.addEventListener('pointermove',ev=>{
   if(tip.hidden) return;
   const tw=tip.offsetWidth, th=tip.offsetHeight, gap=14, margin=8;
@@ -519,7 +536,7 @@ world.addEventListener('pointermove',ev=>{
   ty=clamp(ty,margin,Math.max(margin,innerHeight-margin-th));
   tip.style.left=tx+'px'; tip.style.top=ty+'px';
 });
-world.addEventListener('pointerout',ev=>{ const t=ev.target.closest('.tile'); if(!t) return; t.classList.remove('hit'); tip.hidden=true; Z.hover=null; });
+world.addEventListener('pointerout',ev=>{ const t=ev.target.closest('.tile'); if(!t) return; t.classList.remove('hit'); tip.hidden=true; });
 zui.addEventListener('keydown',ev=>{ const k=ev.key; if(k==='+'||k==='='){ goLevel(Z.L+1); } else if(k==='-'||k==='_'){ goLevel(Z.L-1); } else if(k==='0'){ resetView(); } else if(k==='ArrowLeft'){ Z.tx+=80; } else if(k==='ArrowRight'){ Z.tx-=80; } else if(k==='ArrowUp'){ Z.ty+=80; } else if(k==='ArrowDown'){ Z.ty-=80; } else return; ev.preventDefault(); clampPan(); applyCamera(); sync(); });
 mini.addEventListener('pointerdown',ev=>{ ev.stopPropagation(); const r=mini.getBoundingClientRect(); const go=e=>{ const g=laneGeom(Z.L); const wx=(e.clientX-r.left)/r.width*g.W, wy=(e.clientY-r.top)/r.height*g.H; Z.tx=Z.vw/2-wx*Z.k; Z.ty=Z.vh/2-wy*Z.k; clampPan(); applyCamera(); sync(); }; go(ev); const mv=e=>go(e); const up=()=>{ window.removeEventListener('pointermove',mv); window.removeEventListener('pointerup',up); }; window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up); });
 function resetView(){ Z.L=0; Z.k=1; Z.tx=0; Z.ty=0; Z.focusMaxY=0; Z.focusMinY=null; layoutWorld(); clampPan(); applyCamera(); sync(true); updateLevelUI(); writeHash(); }
@@ -546,9 +563,13 @@ function applyFilters(){
   const matching=posts.filter(p=>!isFiltered(p)).length, parts=[];
   if(iso!=null) parts.push(`“${THEMES[iso]}”`);
   if(activeTag!=null) parts.push(`#${activeTag}`);
-  document.getElementById('hint').textContent=parts.length?`${matching} posts matching ${parts.join(' + ')}`:'';
+  Z.filterHint=parts.length?`${matching} posts matching ${parts.join(' + ')}`:''; updateHint();
   Z.miniDirty=true; renderMini();
 }
+// With no filter active the hint teaches the gestures, which nothing else on screen does.
+const hintEl=document.getElementById('hint');
+const NAV_HINT=['drag to pan · ctrl-scroll or pinch to zoom · click a dot for titles','drag to pan · click a title to read it · ctrl-scroll or pinch to zoom out'];
+function updateHint(){ hintEl.textContent=Z.filterHint||NAV_HINT[Z.L]; }
 function setIso(d){ iso=d; [...legend.children].forEach((c,i)=>c.setAttribute('aria-pressed',String(i===d))); applyFilters(); }
 function setTag(t){ activeTag=t; [...tagList.children].forEach(c=>c.setAttribute('aria-pressed',String(c.firstChild?.textContent===t))); applyFilters(); }
 const bi=document.getElementById('btn-index'), bd=document.getElementById('btn-date');
