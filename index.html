@@ -119,13 +119,6 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);o
 .bounds{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;transform-origin:0 0;will-change:transform}
 /* During a level change the outgoing world and ribbons become ghosts that keep travelling in the zoom's direction as they fade. */
 .ghost{pointer-events:none}
-.bounds path{fill-opacity:.055;stroke:none}
-/* Feathered lane boundaries. The blur is applied in world space, inside the transformed layer, so it
-   scales with a pinch instead of fighting it, and it is rendered once per level change. A softened
-   edge reads lighter than a hard one, so each level's fill is set alongside its radius. */
-.bounds{filter:blur(12px)}
-.zui.titles .bounds{filter:blur(22px)}
-.zui.titles .bounds path{fill-opacity:.08}
 .tile{position:absolute;left:0;top:0;transform-origin:0 0;border-radius:3px;overflow:hidden;cursor:pointer;color:var(--ink);font-family:"IBM Plex Sans",sans-serif;line-height:1.25;
   background:color-mix(in oklab,var(--c) 11%,var(--panel));border-left:3px solid var(--c);padding:0 6px;display:flex;align-items:center;gap:4px;transition:opacity .25s,background .16s ease,box-shadow .16s ease,outline-color .16s ease}
 .tile.settling{transition:transform .3s cubic-bezier(.22,.61,.36,1),width .3s cubic-bezier(.22,.61,.36,1),height .3s cubic-bezier(.22,.61,.36,1),opacity .24s}
@@ -138,7 +131,7 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);o
 .tile.l1{padding:5px 7px 5px 6px;align-items:flex-start}
 .tile .t1{width:100%;min-width:0;font:400 13px/1.25 Newsreader,Georgia,serif;overflow-wrap:anywhere}
 .tile.l1:hover{z-index:2}
-.mini{position:absolute;right:14px;bottom:14px;width:240px;height:76px;border:1px solid color-mix(in oklab,var(--rule) 75%,var(--accent));border-radius:5px;background:var(--scrim);backdrop-filter:blur(6px);z-index:5;overflow:hidden;cursor:crosshair}
+.mini{position:absolute;right:14px;bottom:14px;width:240px;height:76px;border:1px solid color-mix(in oklab,var(--rule) 75%,var(--accent));border-radius:5px;background:var(--scrim);z-index:5;overflow:hidden;cursor:crosshair}
 .mini canvas{position:absolute;inset:0;width:100%;height:100%}
 .mini .mr{position:absolute;border:1.5px solid var(--accent-strong);border-radius:2px;background:var(--accent-soft);pointer-events:none}
 #tip{position:fixed;pointer-events:none;z-index:9;background:var(--ink);color:var(--surface);border:1px solid color-mix(in oklab,var(--accent) 55%,var(--ink));border-radius:5px;padding:8px 11px;max-width:320px;font-size:13px;line-height:1.35;box-shadow:0 6px 24px rgba(0,0,0,.18)}
@@ -181,7 +174,7 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);o
   <div class="workspace">
     <div class="zui" id="zui" tabindex="0" aria-label="Zoomable lanes of word vomits">
       <div class="axis" id="axis"></div>
-      <div class="viewport" id="vp"><div class="vlines" id="vlines"></div><svg class="bounds" id="ribbons"></svg><div class="world" id="world"></div><i class="pan-edge left"></i><i class="pan-edge right"></i></div>
+      <div class="viewport" id="vp"><div class="vlines" id="vlines"></div><canvas class="bounds" id="ribbons"></canvas><div class="world" id="world"></div><i class="pan-edge left"></i><i class="pan-edge right"></i></div>
       <div class="labels" id="labels"></div>
       <div class="zg" id="zg" aria-hidden="true"><span class="a"></span><span class="t"><i class="z"></i><i class="one"></i><i class="m"></i></span><span class="b"></span></div>
       <div class="mini" id="mini"><canvas></canvas><div class="mr"></div></div>
@@ -311,10 +304,18 @@ function laneGeom(L){ return Z.lay[L]; }
 function tilePos(p,L){ return p.pos[L]; }
 function worldToAbs(wx,wy,L){ const g=laneGeom(L); const u=wx/LV[L].pitch; let lane=K-1; for(let d=0;d<K;d++){ if(wy<g.bands[d].bot){ lane=d; break; } } const b=g.bands[lane]; return {u,lane,f:(wy-b.top)/Math.max(1,b.bot-b.top)}; }
 function absToWorld(a,L){ const b=laneGeom(L).bands[a.lane]; return [a.u*LV[L].pitch, b.top+a.f*(b.bot-b.top)]; }
+// The ribbons are a pre-rendered bitmap: drawn at a fraction of world resolution, blurred once, and
+// scaled up by the compositor. A bitmap scales on the GPU with no re-rasterization. The SVG it
+// replaces was re-rasterized, blur included, on every frame of a pinch, which pinned the GPU.
+const RIB_BLUR=[12,22], RIB_ALPHA=[.055,.08];
+function laneColor(cs,d){ return cs.getPropertyValue(COLORS[d].slice(4,-1)).trim()||'#888'; }
+function paintRibbons(g){ const s=Math.min(0.5,4096/g.W,4096/g.H), w=Math.ceil(g.W*s), h=Math.ceil(g.H*s), cs=getComputedStyle(document.documentElement);
+  const off=document.createElement('canvas'); off.width=w; off.height=h; const oc=off.getContext('2d'); oc.setTransform(s,0,0,s,0,0);
+  for(let d=0;d<K;d++){ oc.fillStyle=laneColor(cs,d); oc.fill(new Path2D(ribbonD(d,g))); }
+  ribbons.width=w; ribbons.height=h; ribbons.style.width=g.W+'px'; ribbons.style.height=g.H+'px';
+  const ctx=ribbons.getContext('2d'); ctx.clearRect(0,0,w,h); ctx.filter=`blur(${(RIB_BLUR[Z.L]*s).toFixed(1)}px)`; ctx.globalAlpha=RIB_ALPHA[Z.L]; ctx.drawImage(off,0,0); ctx.filter='none'; ctx.globalAlpha=1; }
 function layoutWorld(){ const g=laneGeom(Z.L); Z.canvasW=g.W; Z.canvasH=g.H; world.style.width=g.W+'px'; world.style.height=g.H+'px';
-  ribbons.setAttribute('width',g.W); ribbons.setAttribute('height',g.H); ribbons.setAttribute('viewBox',`0 0 ${g.W} ${g.H}`); let html='';
-  for(let d=0;d<K;d++) html+=`<path style="fill:${COLORS[d]}" d="${ribbonD(d,g)}"/>`;
-  ribbons.innerHTML=html;
+  paintRibbons(g);
   // one label per content run, living in the world so it moves with its content
   world.querySelectorAll('.wl').forEach(e=>e.remove());
   for(let d=0;d<K;d++){ for(const r of g.runs[d]){ const el=document.createElement('div'); el.className='pill wl'; el.style.setProperty('--c',COLORS[d]); el.style.left=r.x+'px'; el.style.top=r.y+'px'; el.style.opacity=0; el.innerHTML=`<i></i>${THEMES[d]}`; world.appendChild(el); r.el=el; } } }
@@ -375,7 +376,7 @@ function goLevel(L2,ax,ay,centerVertical=false,focusPost=null,allowEdgePadding=f
   // the cards and the blurred ribbons before it could show a frame, which read as a stall.
   let ghosts=null, oldTiles=null; hideGauge();
   if(!reduced){ killSettle(); const ow=world, orb=ribbons; ow.classList.add('ghost'); orb.classList.add('ghost'); ow.style.willChange=orb.style.willChange='';
-    const nw=document.createElement('div'); nw.className='world'; const nrb=document.createElementNS('http://www.w3.org/2000/svg','svg'); nrb.setAttribute('class','bounds');
+    const nw=document.createElement('div'); nw.className='world'; const nrb=document.createElement('canvas'); nrb.className='bounds';
     // Zooming in, the ghost sits under the incoming cards; zooming out, the collapsing cards sit over the dots.
     if(zoomIn) ow.after(nrb,nw); else orb.before(nrb,nw);
     world=nw; ribbons=nrb; ghosts=[ow,orb]; oldTiles=Z.el; Z.el={}; Z.rasterK=1; }
