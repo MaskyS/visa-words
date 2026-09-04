@@ -11,23 +11,10 @@
 <style>
 :root{
   color-scheme:light;
-  --surface:#fbfaf6; --panel:#ffffff; --ink:#1c1b18; --ink-2:#5c5a54; --ink-3:#8e8b83;
-  --rule:#e4e1d8; --rule-2:#eeece5; --hover:#f1efe8; --shadow:rgba(30,25,10,.18); --scrim:rgba(255,255,255,.82);
-  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300; --s7:#4a3aa7; --s8:#e34948; --s9:#b3b0a6;
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    color-scheme:dark;
-    --surface:#1a1a19; --panel:#1f1f1e; --ink:#f1efe8; --ink-2:#b9b6ac; --ink-3:#7f7c74;
-    --rule:#33322f; --rule-2:#2a2927; --hover:#292826; --shadow:rgba(0,0,0,.5); --scrim:rgba(31,31,30,.85);
-    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767; --s9:#66645d;
-  }
-}
-:root[data-theme="dark"]{
-  color-scheme:dark;
-  --surface:#1a1a19; --panel:#1f1f1e; --ink:#f1efe8; --ink-2:#b9b6ac; --ink-3:#7f7c74;
-  --rule:#33322f; --rule-2:#2a2927; --hover:#292826; --shadow:rgba(0,0,0,.5); --scrim:rgba(31,31,30,.85);
-  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767; --s9:#66645d;
+  --surface:oklch(97.5% .004 160); --panel:#fff; --ink:oklch(22% .01 160); --ink-2:oklch(43% .012 160); --ink-3:oklch(58% .01 160);
+  --rule:oklch(88% .008 160); --rule-2:oklch(93% .006 160); --hover:oklch(95% .008 160); --shadow:rgba(12,28,20,.14); --scrim:rgba(255,255,255,.88);
+  --accent:oklch(64% .105 216); --accent-strong:oklch(52% .09 216); --accent-soft:oklch(64% .105 216/.10); --signal-green:oklch(59.1% .183 143);
+  --s1:oklch(59% .14 245); --s2:oklch(61% .19 38); --s3:oklch(60.4% .14 155); --s4:oklch(65% .13 78); --s5:oklch(62% .17 350); --s6:oklch(59.1% .183 143); --s7:oklch(57% .18 292); --s8:oklch(60% .20 25); --s9:oklch(58% .015 150);
 }
 *{box-sizing:border-box}
 html,body{height:100%;touch-action:pan-x pan-y;overscroll-behavior-x:none}
@@ -47,11 +34,11 @@ body.reader-open .controls .legend{flex-wrap:nowrap}
 body.reader-open .controls .chip{flex:none}
 body.reader-open .tag-panel{margin-right:calc(var(--reader-w) + 2px)}
 .tag-panel{position:relative;margin:0 0 5px}
-.filter-head{display:flex;align-items:center;gap:12px;min-height:30px}
+.filter-head{display:flex;align-items:center;gap:14px;min-height:30px}
 .time-control,.view-control{display:flex;flex-direction:row;align-items:center;gap:7px;flex:none}
-.filter-head .seglbl{font-size:10.5px;line-height:1;font-weight:500;color:var(--ink-2);letter-spacing:.045em;margin:0}
-.filter-head .seg button{font-size:11.5px}
-.tag-toggle{appearance:none;border:0;background:transparent;color:var(--ink-2);padding:2px 0;font:500 11.5px/1.4 "IBM Plex Sans",sans-serif;letter-spacing:.04em;text-transform:uppercase;cursor:pointer}
+.filter-head .seglbl{font-size:11px;line-height:1;font-weight:500;color:var(--ink-2);letter-spacing:.025em;margin:0}
+.filter-head .seg button{font-size:12px}
+.tag-toggle{appearance:none;border:0;background:transparent;color:var(--ink-2);padding:3px 0;font:500 12px/1.4 "IBM Plex Sans",sans-serif;letter-spacing:.025em;text-transform:uppercase;cursor:pointer}
 .tag-toggle:hover{color:var(--ink);background:transparent}
 .tag-toggle .caret{display:inline-block;width:14px;color:var(--ink-3)}
 .tag-toggle .k{font-family:"IBM Plex Mono",monospace;color:var(--ink-3);margin-left:4px}
@@ -62,76 +49,75 @@ body.reader-open .tag-panel{margin-right:calc(var(--reader-w) + 2px)}
 .tag-panel::before{left:0;background:linear-gradient(90deg,var(--surface),transparent)}
 .tag-panel::after{right:0;background:linear-gradient(270deg,var(--surface),transparent)}
 .tag-panel.can-scroll-left::before,.tag-panel.can-scroll-right::after{opacity:1}
-.seg{display:inline-flex;border:1px solid var(--rule);border-radius:6px;overflow:hidden;background:var(--panel)}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:5px;overflow:hidden;background:transparent}
 .seg button{appearance:none;border:0;background:transparent;color:var(--ink-2);font:500 13px/1 "IBM Plex Sans",sans-serif;padding:8px 12px;cursor:pointer}
 .seg button+button{border-left:1px solid var(--rule)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
 .seg button:hover:not([aria-pressed="true"]){background:var(--hover)}
-.time-control .seg,.view-control .seg{height:28px;border:1px solid var(--rule);border-radius:6px;background:transparent;overflow:hidden}
+.time-control .seg,.view-control .seg{height:29px;border:1px solid var(--rule);border-radius:5px;background:transparent;overflow:hidden}
 .time-control .seg button,.view-control .seg button{padding:0 9px;border:0;border-radius:0;background:transparent;color:var(--ink-3)}
 .time-control .seg button+button,.view-control .seg button+button{border-left:1px solid var(--rule)}
-.time-control .seg button[aria-pressed="true"],.view-control .seg button[aria-pressed="true"]{background:var(--hover);color:var(--ink);font-weight:500}
+.time-control .seg button[aria-pressed="true"],.view-control .seg button[aria-pressed="true"]{background:var(--hover);color:var(--ink);font-weight:500;box-shadow:inset 0 -2px var(--accent)}
 .time-control .seg button:hover:not([aria-pressed="true"]),.view-control .seg button:hover:not([aria-pressed="true"]){background:var(--hover);color:var(--ink-2)}
-button:focus-visible,.zui:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+button:focus-visible,.zui:focus-visible{outline:2px solid var(--accent-strong);outline-offset:2px}
 .seglbl{font-size:11.5px;color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase;margin-right:8px}
-.iconb{appearance:none;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);height:30px;min-width:30px;padding:0 8px;border-radius:6px;font:500 14px/1 "IBM Plex Mono",monospace;cursor:pointer}
+.iconb{appearance:none;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);height:30px;min-width:30px;padding:0 8px;border-radius:4px;font:500 14px/1 "IBM Plex Mono",monospace;cursor:pointer}
 .iconb:hover{background:var(--hover)}
 .legend{display:flex;flex-wrap:wrap;gap:6px 8px}
-.chip{appearance:none;border:1px solid var(--rule);background:transparent;color:var(--ink-2);border-radius:999px;padding:5px 11px 5px 8px;font:400 12.5px/1 "IBM Plex Sans",sans-serif;display:inline-flex;align-items:center;gap:7px;cursor:pointer}
+.chip{--c:var(--accent);appearance:none;border:1px solid var(--rule);background:transparent;color:var(--ink-2);border-radius:7px;padding:5px 10px 5px 8px;font:400 12.5px/1 "IBM Plex Sans",sans-serif;display:inline-flex;align-items:center;gap:7px;cursor:pointer;transition:background .15s ease,border-color .15s ease,color .15s ease}
+.chip.tagchip{--c:var(--signal-green)}
 .chip i{width:10px;height:10px;border-radius:50%;background:var(--c);display:inline-block;flex:none}
 .chip .k{font:500 11.5px/1 "IBM Plex Mono",monospace;color:var(--ink-3)}
-.chip[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
-.chip[aria-pressed="true"] .k{color:var(--surface);opacity:.8}
+.chip[aria-pressed="true"]{background:color-mix(in oklab,var(--c) 12%,var(--surface));color:var(--ink);border-color:color-mix(in oklab,var(--c) 72%,var(--rule));box-shadow:inset 0 -2px var(--c)}
+.chip[aria-pressed="true"] .k{color:var(--ink-2);opacity:1}
 .chip:hover{background:var(--hover)}
-.chip[aria-pressed="true"]:hover{background:var(--ink)}
+.chip[aria-pressed="true"]:hover{background:color-mix(in oklab,var(--c) 17%,var(--surface))}
 .hint{font-size:12.5px;color:var(--ink-3)}
 
 /* ---------- ZUI ---------- */
 .workspace{position:relative;display:flex;flex:1;min-width:0;min-height:0}
 .zui{position:relative;flex:1;min-width:0;height:100%;min-height:0;border:1px solid var(--rule);border-radius:8px 8px 0 0;overflow:hidden;background:var(--panel);user-select:none;-webkit-user-select:none;--A:40px}
-.corner{position:absolute;left:8px;top:9px;height:22px;display:inline-flex;align-items:center;padding:0 8px;border-radius:999px;border:1px solid var(--rule);background:var(--scrim);font:500 10px/1 "IBM Plex Mono",monospace;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase;z-index:4;pointer-events:none}
+.corner{position:absolute;left:0;top:0;height:var(--A);min-width:48px;display:flex;align-items:flex-start;padding:5px 10px 0 8px;background:linear-gradient(90deg,var(--panel) 78%,transparent);font:600 11px/1 "IBM Plex Mono",monospace;color:var(--ink-2);z-index:4;pointer-events:none}
 .axis{position:absolute;left:0;top:0;right:0;height:var(--A);overflow:hidden;border-bottom:1px solid var(--rule);z-index:3;background:var(--panel)}
 .axis .tk{position:absolute;top:0;height:100%;border-left:1px solid var(--rule)}
-.axis .tk span{position:absolute;left:4px;top:5px;font:500 11px/1 "IBM Plex Mono",monospace;color:var(--ink-2);white-space:nowrap}
+.axis .tk span{position:absolute;left:5px;top:5px;font:500 11px/1 "IBM Plex Mono",monospace;color:var(--ink-2);white-space:nowrap}
 .axis .tk.minor{border-left-color:var(--rule-2)}
 .axis .tk.left span{left:auto;right:5px}
 .axis .tk.minor span{color:var(--ink-3);font-weight:400}
 .axis .yr{position:absolute;bottom:4px;font:500 10px/1 "IBM Plex Mono",monospace;color:var(--ink-3);white-space:nowrap;padding-left:4px;border-left:2px solid var(--ink-3);height:12px;line-height:12px}
 .labels{position:absolute;left:0;top:var(--A);right:0;bottom:0;overflow:hidden;z-index:2;pointer-events:none}
-.pill{position:absolute;left:0;top:0;display:inline-flex;align-items:center;gap:7px;height:22px;padding:0 6px 0 2px;font:500 11px/1 "IBM Plex Sans",sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap;pointer-events:none}
+.pill{position:absolute;left:0;top:0;display:inline-flex;align-items:center;gap:7px;height:22px;padding:0 6px 0 2px;font:500 11px/1 "IBM Plex Sans",sans-serif;letter-spacing:.035em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap;pointer-events:none}
 .pill i{width:8px;height:8px;border-radius:50%;background:var(--c);flex:none}
 .pill .ct{font:400 10px/1 "IBM Plex Mono",monospace;color:var(--ink-3);letter-spacing:0}
-.wl{z-index:1;transition:opacity .2s}
-.labels .lb{transition:opacity .2s;background:var(--scrim);backdrop-filter:blur(4px);border-radius:4px;padding:0 8px 0 6px}
-.labels .lb.glide{transition:opacity .2s,transform .25s ease-out}
+.wl{z-index:1}
+.labels .lb{background:var(--scrim);backdrop-filter:blur(4px);border-radius:4px;padding:0 8px 0 6px}
 .viewport{position:absolute;left:0;top:var(--A);right:0;bottom:0;overflow:hidden;touch-action:none;overscroll-behavior:none;cursor:grab}
 .viewport.dragging{cursor:grabbing}
 .pan-edge{position:absolute;z-index:8;pointer-events:none;opacity:0;transition:opacity .18s ease}
 .pan-edge.left,.pan-edge.right{top:0;bottom:0;width:22px}
 .pan-edge.top{left:0;right:var(--pan-right-inset,0px);height:22px}
 .pan-edge.bottom{left:0;right:var(--pan-right-inset,0px);height:28px}
-.pan-edge.left{left:0;background:linear-gradient(90deg,color-mix(in oklab,var(--ink) 9%,transparent),transparent)}
-.pan-edge.right{right:var(--pan-right-inset,0px);background:linear-gradient(270deg,color-mix(in oklab,var(--ink) 9%,transparent),transparent)}
-.pan-edge.top{top:0;background:linear-gradient(180deg,color-mix(in oklab,var(--ink) 7%,transparent),transparent)}
-.pan-edge.bottom{bottom:0;background:linear-gradient(0deg,color-mix(in oklab,var(--ink) 14%,transparent) 0,color-mix(in oklab,var(--ink) 5%,transparent) 42%,transparent 100%)}
+.pan-edge.left{left:0;background:linear-gradient(90deg,color-mix(in oklab,var(--accent-strong) 14%,transparent),transparent)}
+.pan-edge.right{right:var(--pan-right-inset,0px);background:linear-gradient(270deg,color-mix(in oklab,var(--accent-strong) 14%,transparent),transparent)}
+.pan-edge.top{top:0;background:linear-gradient(180deg,color-mix(in oklab,var(--accent-strong) 10%,transparent),transparent)}
+.pan-edge.bottom{bottom:0;background:linear-gradient(0deg,color-mix(in oklab,var(--accent-strong) 18%,transparent) 0,color-mix(in oklab,var(--accent-strong) 6%,transparent) 42%,transparent 100%)}
 .zui.can-pan-left .pan-edge.left,.zui.can-pan-right .pan-edge.right,.zui.can-pan-up .pan-edge.top,.zui.can-pan-down .pan-edge.bottom{opacity:1}
 .vlines{position:absolute;inset:0;pointer-events:none}
 .vlines div{position:absolute;top:0;bottom:0;border-left:1px dotted var(--rule)}
 .vlines div.major{border-left:1px dashed color-mix(in oklab,var(--ink-3) 50%,transparent)}
 .world{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
-.world.settling{transition:transform .42s cubic-bezier(.22,.61,.36,1)}
+.world.settling{transition:transform .3s cubic-bezier(.22,.61,.36,1)}
 .bounds{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
-.bounds path{fill-opacity:.055;stroke:none}
-:root[data-theme="dark"] .bounds path{fill-opacity:.09}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .bounds path{fill-opacity:.09}}
+.bounds path{fill-opacity:.047;stroke:none}
 .tile{position:absolute;left:0;top:0;transform-origin:0 0;border-radius:3px;overflow:hidden;cursor:pointer;color:var(--ink);font-family:"IBM Plex Sans",sans-serif;line-height:1.25;
-  background:color-mix(in oklab,var(--c) 13%,var(--panel));border-left:3px solid var(--c);padding:0 6px;display:flex;align-items:center;gap:4px;transition:opacity .25s}
-.tile.settling{transition:transform .42s cubic-bezier(.22,.61,.36,1),width .42s cubic-bezier(.22,.61,.36,1),height .42s cubic-bezier(.22,.61,.36,1),opacity .3s}
+  background:color-mix(in oklab,var(--c) 11%,var(--panel));border-left:3px solid var(--c);padding:0 6px;display:flex;align-items:center;gap:4px;transition:opacity .25s,background .16s ease,box-shadow .16s ease,outline-color .16s ease}
+.tile.settling{transition:transform .3s cubic-bezier(.22,.61,.36,1),width .3s cubic-bezier(.22,.61,.36,1),height .3s cubic-bezier(.22,.61,.36,1),opacity .24s}
 .tile.enter{opacity:0}
 .tile.dim{opacity:.10}
-.tile.hit:not(.open){outline:1px solid color-mix(in oklab,var(--c) 58%,var(--ink-3));outline-offset:1px;box-shadow:0 2px 8px var(--shadow);z-index:3}
-.tile.open{outline:0;box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--ink),0 5px 16px var(--shadow);z-index:4}
+.tile.hit:not(.open){outline:1px solid color-mix(in oklab,var(--c) 75%,var(--ink-3));outline-offset:1px;background:color-mix(in oklab,var(--c) 16%,var(--panel));box-shadow:0 2px 7px var(--shadow);z-index:3}
+.tile.open{outline:2px solid var(--accent-strong);outline-offset:2px;box-shadow:0 0 0 1px var(--c);z-index:4}
 .tile.l0{background:var(--c);border:0;padding:0;border-radius:1.5px;cursor:zoom-in}
+.tile.l0.hit{background:var(--c);outline:2px solid color-mix(in oklab,var(--accent) 72%,white);outline-offset:2px;box-shadow:0 0 0 1px color-mix(in oklab,var(--c) 65%,var(--ink));z-index:3}
 .tile .n{font:500 10px/1 "IBM Plex Mono",monospace;color:var(--ink-2);flex:none;letter-spacing:.01em}
 .tile sup{font:500 9px/1 "IBM Plex Mono",monospace;color:var(--ink-3);vertical-align:top;position:relative;top:1px;margin-left:4px;letter-spacing:.02em}
 .tile.l1{padding:5px 7px 5px 6px;align-items:flex-start}
@@ -141,36 +127,39 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--s1);outline-offs
 .tile.l3 .t2{font-size:15.5px}
 .tile .x{font-size:11.5px;line-height:1.35;color:var(--ink-2);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .tile .ft{font:400 10.5px/1 "IBM Plex Mono",monospace;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:auto}
-.tile.l1:hover,.tile.l2:hover,.tile.l3:hover{box-shadow:0 3px 12px var(--shadow);z-index:2}
-.mini{position:absolute;right:14px;bottom:14px;width:240px;height:76px;border:1px solid var(--rule);border-radius:6px;background:var(--scrim);backdrop-filter:blur(6px);z-index:5;overflow:hidden;cursor:crosshair}
+.tile.l1:hover{z-index:2}
+.mini{position:absolute;right:14px;bottom:14px;width:240px;height:76px;border:1px solid color-mix(in oklab,var(--rule) 75%,var(--accent));border-radius:5px;background:var(--scrim);backdrop-filter:blur(6px);z-index:5;overflow:hidden;cursor:crosshair}
 .mini canvas{position:absolute;inset:0;width:100%;height:100%}
-.mini .mr{position:absolute;border:1.5px solid var(--ink);border-radius:2px;background:color-mix(in oklab,var(--ink) 8%,transparent);pointer-events:none}
+.mini .mr{position:absolute;border:1.5px solid var(--accent-strong);border-radius:2px;background:var(--accent-soft);pointer-events:none}
 .status{display:none}
 .status b{color:var(--ink);font-weight:500}
 .status .kb{color:var(--ink-3);font-weight:400;margin-top:4px}
-#tip{position:fixed;pointer-events:none;z-index:9;background:var(--ink);color:var(--surface);border-radius:6px;padding:8px 11px;max-width:320px;font-size:13px;line-height:1.35;box-shadow:0 6px 24px rgba(0,0,0,.18)}
+#tip{position:fixed;pointer-events:none;z-index:9;background:var(--ink);color:var(--surface);border:1px solid color-mix(in oklab,var(--accent) 55%,var(--ink));border-radius:5px;padding:8px 11px;max-width:320px;font-size:13px;line-height:1.35;box-shadow:0 6px 24px rgba(0,0,0,.18)}
 #tip .m{font:500 12px/1 "IBM Plex Mono",monospace;opacity:.75;margin-bottom:5px}
 #tip .t{font:400 15px/1.3 Newsreader,Georgia,serif}
 #tip .g{opacity:.7;font-size:12px;margin-top:5px}
-.reader{display:none;position:fixed;z-index:12;right:0;top:0;width:var(--reader-w);height:100vh;height:100dvh;min-height:0;border-left:1px solid var(--rule);overflow:hidden;background:var(--surface)}
+.reader{display:none;position:fixed;z-index:12;right:0;top:0;width:var(--reader-w);height:100vh;height:100dvh;min-height:0;border-left:1px solid color-mix(in oklab,var(--rule) 82%,var(--accent));overflow:hidden;background:var(--surface)}
 .reader.open{display:flex;flex-direction:column}
 .workspace.reader-open .mini{right:calc(var(--reader-w) + 14px)}
 .reader-head{display:flex;align-items:center;justify-content:flex-end;height:40px;min-height:40px;padding:5px 9px;border-bottom:1px solid var(--rule);background:var(--surface)}
 .reader-head .iconb{background:transparent}
+.reader-head .iconb:hover{border-color:color-mix(in oklab,var(--accent) 55%,var(--rule));color:var(--ink)}
 .reader-body{position:relative;flex:1;min-height:0;background:color-mix(in oklab,var(--surface) 96%,var(--ink))}
+.reader-body::after{content:"";position:absolute;z-index:3;left:0;top:0;width:38%;height:2px;background:var(--accent);opacity:0;transform:translateX(-110%);pointer-events:none}
+.reader.loading .reader-body::after{opacity:1;background:var(--signal-green);animation:reader-progress 1.05s cubic-bezier(.45,0,.25,1) infinite}
 .reader iframe{display:block;width:100%;height:100%;border:0;background:color-mix(in oklab,var(--surface) 96%,var(--ink))}
 .reader-loading{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;gap:9px;background:color-mix(in oklab,var(--surface) 68%,transparent);backdrop-filter:blur(1.5px);color:var(--ink-2);font:500 12px/1 "IBM Plex Sans",sans-serif;opacity:0;visibility:hidden;transition:opacity .16s ease,visibility 0s linear .16s;pointer-events:none}
 .reader.loading .reader-loading{opacity:1;visibility:visible;transition-delay:0s}
-.reader-loading::before{content:"";width:15px;height:15px;border:2px solid color-mix(in oklab,var(--ink-3) 35%,transparent);border-top-color:var(--ink-2);border-radius:50%;animation:reader-spin .7s linear infinite}
+.reader-loading::before{content:"";width:15px;height:15px;border:2px solid color-mix(in oklab,var(--signal-green) 28%,transparent);border-top-color:var(--signal-green);border-radius:50%;animation:reader-spin .7s linear infinite}
 @keyframes reader-spin{to{transform:rotate(360deg)}}
-@media (prefers-reduced-motion:reduce){.world.settling,.tile.settling,.tile{transition:none}}
+@keyframes reader-progress{0%{transform:translateX(-110%)}55%{transform:translateX(150%)}100%{transform:translateX(300%)}}
+@media (prefers-reduced-motion:reduce){.world.settling,.tile.settling,.tile{transition:none}.reader.loading .reader-body::after{animation:none;transform:none;width:100%}}
 @media (max-width:760px){.mini{display:none}.status{max-width:80vw}.reader{inset:0 0 0 auto;width:100vw;z-index:20;box-shadow:none}body.reader-open .controls,body.reader-open .tag-panel{margin-right:0}}
 </style>
 
 <div class="wrap">
   <div class="controls">
     <div class="legend" id="legend" aria-label="Themes"></div>
-    <span class="hint" id="hint"></span>
   </div>
 
   <div class="tag-panel" aria-label="Tag filters">
@@ -178,6 +167,7 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--s1);outline-offs
       <div class="time-control"><span class="seglbl">Spacing</span><span class="seg" role="group" aria-label="Horizontal spacing"><button id="btn-index" aria-pressed="false">Equal per post</button><button id="btn-date" aria-pressed="true">By date</button></span></div>
       <div class="view-control"><span class="seglbl">View</span><span class="seg" id="levels" role="group" aria-label="View mode"></span></div>
       <button class="tag-toggle" id="tag-toggle" aria-expanded="false" aria-controls="tag-list"><span class="caret">▸</span>Tags <span class="k" id="tag-total"></span></button>
+      <span class="hint" id="hint"></span>
     </div>
     <div class="tag-list" id="tag-list" hidden></div>
   </div>
@@ -185,6 +175,7 @@ button:focus-visible,.zui:focus-visible{outline:2px solid var(--s1);outline-offs
   <div class="workspace">
     <div class="zui" id="zui" tabindex="0" aria-label="Zoomable lanes of word vomits">
       <div class="axis" id="axis"></div>
+      <div class="corner" id="sticky-year" aria-hidden="true"></div>
       <div class="viewport" id="vp"><div class="vlines" id="vlines"></div><div class="world" id="world"></div><i class="pan-edge left"></i><i class="pan-edge right"></i><i class="pan-edge top"></i><i class="pan-edge bottom"></i></div>
       <div class="labels" id="labels"></div>
       <div class="mini" id="mini"><canvas></canvas><div class="mr"></div></div>
@@ -237,8 +228,8 @@ try{ await document.fonts.ready; await Promise.all(['13px Newsreader','14px News
 const mctx=document.createElement('canvas').getContext('2d');
 function textW(t,font){ mctx.font=font; return mctx.measureText(t).width; }
 const SUPW=textW('0000','500 9px "IBM Plex Mono", monospace')+4;
-// pill widths for the lane labels: dot + gaps + name + count + padding + border
-const LBW=THEMES.map((t,d)=>Math.ceil(2+8+7+textW(t.toUpperCase(),'500 11px "IBM Plex Sans", system-ui, sans-serif')+t.length*0.66+7+textW(String(counts[d]),'400 10px "IBM Plex Mono", monospace')+6+12));
+// Floating lane labels identify the category; totals already live in the top filter chips.
+const LBW=THEMES.map(t=>Math.ceil(2+8+7+textW(t.toUpperCase(),'500 11px "IBM Plex Sans", system-ui, sans-serif')+t.length*0.66+12));
 function preparedTitle(p,font){ p.prep=p.prep||{}; const key=font+'|full-title'; return p.prep[key]||(p.prep[key]=PT?.prepare?.(`${p.title}\u00a0${pad(p.num)}`,font)); }
 function naturalTitleWidth(p,font){ const prep=preparedTitle(p,font); if(prep&&PT?.measureNaturalWidth) return PT.measureNaturalWidth(prep); return textW(p.title,font)+SUPW; }
 function lineCount(p,font,w,isEx,tail=0){ const text=isEx?p.ex:p.title;
@@ -250,7 +241,7 @@ function tileSize(p,L,w){ const lv=LV[L]; if(L===0) return [lv.w,lv.h]; const in
   if(lv.exFont&&p.ex){ const ex=Math.min(lv.exMax,lineCount(p,lv.exFont,inner,true)); h+=ex*lv.exLh+4; } return [w,Math.round(h)]; }
 const sOf=L=>LV[L].pitch/LV[0].pitch; const TOP=LV.length-1; const HDR=26; const REV=true; // newest at the left
 const Z={L:0,k:1,tx:0,ty:0,U:100,lay:[],kTarget:1,ax:0,ay:0,zoomAnim:0,vw:0,vh:0,canvasW:0,canvasH:0,el:{},pool:[],lastX:null,lastY:null,snapT:0,settleT:0,settling:false,focusMaxY:0,focusMinY:null};
-const vp=document.getElementById('vp'), world=document.getElementById('world'), axis=document.getElementById('axis'), vlines=document.getElementById('vlines'), labels=document.getElementById('labels'), zui=document.getElementById('zui'), statusEl=document.getElementById('status'), tip=document.getElementById('tip');
+const vp=document.getElementById('vp'), world=document.getElementById('world'), axis=document.getElementById('axis'), stickyYear=document.getElementById('sticky-year'), vlines=document.getElementById('vlines'), labels=document.getElementById('labels'), zui=document.getElementById('zui'), statusEl=document.getElementById('status'), tip=document.getElementById('tip');
 const mini=document.getElementById('mini'), miniC=mini.querySelector('canvas'), miniR=mini.querySelector('.mr');
 const reader=document.getElementById('reader'), readerFrame=document.getElementById('reader-frame');
 let readerLoadStarted=0, readerLoadTimer=0, revealAnim=0;
@@ -267,12 +258,12 @@ function measureTitleTiles(lv){
     tile.className='tile l1'; tile.style.cssText=`position:static;transform:none;width:${w}px;height:auto;display:flex;margin:0`; title.className='t1'; title.append(document.createTextNode(p.title)); sup.textContent=pad(p.num); title.append(sup); tile.append(title); host.append(tile); probes.push({p,w,title}); }
   document.body.append(host);
   // Appending every probe first means the following reads share one layout pass.
-  for(const {p,w,title} of probes){ p.w[1]=w; p.h[1]=10+Math.round(title.getBoundingClientRect().height); }
+  for(const {p,w,title} of probes){ p.w[1]=w; p.h[1]=12+Math.ceil(title.getBoundingClientRect().height); }
   host.remove();
 }
-function layoutLevel(L,extra=0){ const lv=LV[L], C=Math.ceil(Z.U)+3, gx=lv.gap; let F=new Float64Array(C); const bounds=[], bands=[], runs=[], bandTops=[]; let Wmax=Z.U*lv.pitch;
+function layoutLevel(L,extra=0){ const lv=LV[L], grid=L===1?24:lv.pitch, C=Math.ceil((Z.U*lv.pitch)/grid)+3, gx=lv.gap; let F=new Float64Array(C); const bounds=[], bands=[], runs=[], bandTops=[]; let Wmax=Z.U*lv.pitch;
   if(L===1&&extra===0) measureTitleTiles(lv);
-  const colOf=x=>clamp(Math.floor(x/lv.pitch),0,C-1);
+  const colOf=x=>clamp(Math.floor(x/grid),0,C-1);
   const placeLane=(ps,top,colBot)=>{ const placed=[]; for(const p of ps){ const x=p.u*lv.pitch, w=p.w[L]+gx, h=p.h[L]+lv.rg; const c0=colOf(x), c1=colOf(x+w); let base=0; for(let c=c0;c<=c1;c++){ const t=top(c); if(t>base) base=t; }
       const ov=placed.filter(r=>r.x<x+w&&r.x+r.w>x); const cands=[base,...ov.map(r=>r.y+r.h).filter(v=>v>=base)].sort((a,b)=>a-b); let y=base; for(const c of cands){ if(!ov.some(r=>r.y<c+h&&r.y+r.h>c)){ y=c; break; } }
       placed.push({x,y,w,h,p}); p.pos[L]=[x,y]; if(colBot){ const bt=y+p.h[L]; for(let c=c0;c<=c1;c++) if(bt>colBot[c]) colBot[c]=bt; } if(x+p.w[L]>Wmax) Wmax=x+p.w[L]; } return placed; };
@@ -283,7 +274,7 @@ function layoutLevel(L,extra=0){ const lv=LV[L], C=Math.ceil(Z.U)+3, gx=lv.gap; 
     if(L===0) for(let i=0;i<n;i++){ const p=ps[i]; [p.w[L],p.h[L]]=tileSize(p,L,lv.w); }
     // content runs: contiguous columns covered by tiles. Each run gets a label at its start, and the band under the label is flattened so it sits clear of the lane above.
     const covered=new Uint8Array(C); for(const p of ps){ const c0=colOf(p.u*lv.pitch), c1=colOf(p.u*lv.pitch+p.w[L]+gx); for(let c=c0;c<=c1;c++) covered[c]=1; }
-    const lr=[], lcols=Math.ceil((LBW[d]+12)/lv.pitch);
+    const lr=[], lcols=Math.ceil((LBW[d]+12)/grid);
     // gaps narrower than a label stay inside the run, so labels of one lane are always at least a label apart
     { const bridge=Math.max(2,lcols); let c=0; while(c<C){ if(covered[c]){ c++; continue; } let e=c; while(e<C&&!covered[e]) e++; if(c>0&&e<C&&e-c<bridge){ for(let i=c;i<e;i++) covered[i]=1; } c=e; } }
     for(let c=0;c<C;c++){ if(!covered[c]) continue; const c0=c; while(c+1<C&&covered[c+1]) c++; const span1=Math.min(C-1,c0+lcols-1); let m=0; for(let i=c0;i<=span1;i++) if(F[i]>m) m=F[i]; for(let i=c0;i<=span1;i++) if(m>raise[i]) raise[i]=m; lr.push({c0,c1:c,span1,m}); }
@@ -293,26 +284,37 @@ function layoutLevel(L,extra=0){ const lv=LV[L], C=Math.ceil(Z.U)+3, gx=lv.gap; 
     for(const c of Array(C).keys()) colBot[c]=thinBot(c); for(const p of ps){ const x=p.u*lv.pitch, b=p.pos[L][1]+p.h[L]; const c0=colOf(x), c1=colOf(x+p.w[L]+gx); for(let c=c0;c<=c1;c++) if(b>colBot[c]) colBot[c]=b; }
     // a label wider than its run must not be tucked under by the next lane
     for(const r of lr){ const lb=r.m+extra/2+HDR; for(let c=r.c0;c<=r.span1;c++) if(lb>colBot[c]) colBot[c]=lb; }
-    runs.push(lr.map(r=>({c0:r.c0,c1:r.c1,x:r.c0*lv.pitch+6,y:r.m+extra/2+(HDR-22)/2}))); bandTops.push(bt);
-    for(let c=0;c<C;c++){ NF[c]=colBot[c]+lv.pad+extra/2; } const SF=new Float64Array(C); for(let c=0;c<C;c++){ SF[c]=Math.max(NF[c], c>0?NF[c-1]:0, c<C-1?NF[c+1]:0); if(SF[c]>bandBot) bandBot=SF[c]; }
+    runs.push(lr.map(r=>({c0:r.c0,c1:r.c1,x:r.c0*grid+6,y:r.m+extra/2+(HDR-22)/2}))); bandTops.push(bt);
+    for(let c=0;c<C;c++){ NF[c]=colBot[c]+lv.pad+extra/2; if(NF[c]>bandBot) bandBot=NF[c]; }
+    const SF=new Float64Array(C);
+    if(L===0){
+      // Dots benefit from stable global rows: their small, regular marks can
+      // show density inside a lane without moving the category itself.
+      SF.fill(bandBot);
+    }else{
+      // Titles need local height. Reserving the worst card stack across the
+      // entire timeline would create vast empty gaps in every other period.
+      for(let c=0;c<C;c++) SF[c]=Math.max(NF[c],c>0?NF[c-1]:0,c<C-1?NF[c+1]:0);
+    }
     bands.push({top:bandTop,bot:bandBot}); F=SF; }
   bounds.push(F); let H=0; for(let c=0;c<C;c++) if(F[c]>H) H=F[c];
   if(extra===0 && H<Z.vh) return layoutLevel(L,(Z.vh-H)/K);
-  return {bounds,bands,runs,bandTops,H,W:Wmax,C}; }
+  return {bounds,bands,runs,bandTops,H,W:Wmax,C,grid}; }
 function laneGeom(L){ return Z.lay[L]; }
 function tilePos(p,L){ return p.pos[L]; }
 function worldToAbs(wx,wy,L){ const g=laneGeom(L); const u=wx/LV[L].pitch; let lane=K-1; for(let d=0;d<K;d++){ if(wy<g.bands[d].bot){ lane=d; break; } } const b=g.bands[lane]; return {u,lane,f:(wy-b.top)/Math.max(1,b.bot-b.top)}; }
 function absToWorld(a,L){ const b=laneGeom(L).bands[a.lane]; return [a.u*LV[L].pitch, b.top+a.f*(b.bot-b.top)]; }
 function layoutWorld(){ const g=laneGeom(Z.L); Z.canvasW=g.W; Z.canvasH=g.H; world.style.width=g.W+'px'; world.style.height=g.H+'px';
   let svg=world.querySelector('svg.bounds'); if(!svg){ svg=document.createElementNS('http://www.w3.org/2000/svg','svg'); svg.setAttribute('class','bounds'); world.prepend(svg); }
-  svg.setAttribute('width',g.W); svg.setAttribute('height',g.H); svg.setAttribute('viewBox',`0 0 ${g.W} ${g.H}`); const pitch=LV[Z.L].pitch; let html='';
-  for(let d=0;d<K;d++){ const T=g.bounds[d], B=g.bounds[d+1]; const top=stepPts(T,g.C,pitch,g.W), bot=stepPts(B,g.C,pitch,g.W).reverse();
-    html+=`<path style="fill:${COLORS[d]}" d="M${[...top,...bot].map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join('L')}Z"/>`; }
+  svg.setAttribute('width',g.W); svg.setAttribute('height',g.H); svg.setAttribute('viewBox',`0 0 ${g.W} ${g.H}`); let html='';
+  for(let d=0;d<K;d++){ const shapes=Z.L===1?[]:[{c0:0,c1:g.C-1,top:g.bounds[d],bot:g.bounds[d+1]}]; for(const s of shapes){ const top=stepRange(s.top,s.c0,s.c1,g.grid,g.W), bot=stepRange(s.bot,s.c0,s.c1,g.grid,g.W).reverse();
+      html+=`<path style="fill:${COLORS[d]}" d="M${[...top,...bot].map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join('L')}Z"/>`; } }
   svg.innerHTML=html;
   // one label per content run, living in the world so it moves with its content
   world.querySelectorAll('.wl').forEach(e=>e.remove());
-  for(let d=0;d<K;d++){ for(const r of g.runs[d]){ const el=document.createElement('div'); el.className='pill wl'; el.style.setProperty('--c',COLORS[d]); el.style.left=r.x+'px'; el.style.top=r.y+'px'; el.style.opacity=0; el.innerHTML=`<i></i>${THEMES[d]}<span class="ct">${counts[d]}</span>`; world.appendChild(el); r.el=el; } } }
+  for(let d=0;d<K;d++){ for(const r of g.runs[d]){ const el=document.createElement('div'); el.className='pill wl'; el.style.setProperty('--c',COLORS[d]); el.style.left=r.x+'px'; el.style.top=r.y+'px'; el.style.opacity=0; el.innerHTML=`<i></i>${THEMES[d]}`; world.appendChild(el); r.el=el; } } }
 function stepPts(F,C,pitch,W){ const pts=[[0,F[0]]]; for(let c=0;c<C-1;c++){ if(F[c+1]!==F[c]){ pts.push([(c+1)*pitch,F[c]],[(c+1)*pitch,F[c+1]]); } } pts.push([W,F[C-1]]); return pts; }
+function stepRange(F,c0,c1,pitch,W){ const x0=Math.min(W,c0*pitch), pts=[[x0,F[c0]]]; for(let c=c0;c<c1;c++){ const x=Math.min(W,(c+1)*pitch); if(F[c+1]!==F[c]) pts.push([x,F[c]],[x,F[c+1]]); } pts.push([Math.min(W,(c1+1)*pitch),F[c1]]); return pts; }
 function readerOcclusionInset(){
   if(!reader.classList.contains('open')) return 0;
   const vr=vp.getBoundingClientRect(), rr=reader.getBoundingClientRect();
@@ -323,7 +325,7 @@ function readerOcclusionInset(){
 function readerInset(){ const covered=readerOcclusionInset(); return covered?covered+12:0; }
 function clampPan(){ const cw=Z.canvasW*Z.k, inset=readerInset(), usableW=Z.vw-inset, minX=Math.min(0,usableW-cw), maxX=Math.max(0,usableW-cw); Z.tx=clamp(Z.tx,minX,maxX);
   // vertical range follows the content under the viewport, so a shallow stretch never leaves you staring at empty canvas
-  let ch=Z.canvasH*Z.k; const g=Z.lay&&Z.lay[Z.L]; if(g&&g.bounds){ const pitch=LV[Z.L].pitch, B=g.bounds[K]; const cL=clamp(Math.floor(((-Z.tx)/Z.k)/pitch),0,g.C-1), cR=clamp(Math.ceil(((-Z.tx+Z.vw)/Z.k)/pitch),0,g.C-1); let h=0; for(let c=cL;c<=cR;c++) if(B[c]>h) h=B[c]; ch=h*Z.k; }
+  let ch=Z.canvasH*Z.k; const g=Z.lay&&Z.lay[Z.L]; if(g&&g.bounds){ const B=g.bounds[K], cL=clamp(Math.floor(((-Z.tx)/Z.k)/g.grid),0,g.C-1), cR=clamp(Math.ceil(((-Z.tx+Z.vw)/Z.k)/g.grid),0,g.C-1); let h=0; for(let c=cL;c<=cR;c++) if(B[c]>h) h=B[c]; ch=h*Z.k; }
   // A level change may temporarily extend one boundary just far enough to center
   // its focused item. Ordinary panning cannot travel any farther into that space.
   const baseMinY=Math.min(0,Z.vh-ch), minY=Math.min(baseMinY,Z.focusMinY??baseMinY), maxY=Math.max(0,Z.focusMaxY||0), eps=1; Z.ty=clamp(Z.ty,minY,maxY);
@@ -362,7 +364,7 @@ function goLevel(L2,ax,ay,centerVertical=false,focusPost=null,allowEdgePadding=f
   else { Z.focusMaxY=0; Z.focusMinY=null; }
   layoutWorld(); clampPan(); Z.settling=false; world.classList.remove('settling'); applyCamera(); sync(true);
   if(!reduced){
-    const duration=420, ease='cubic-bezier(.22,.61,.36,1)';
+    const duration=300, ease='cubic-bezier(.22,.61,.36,1)';
     for(const [i,el] of Object.entries(Z.el)){ const nr=el.getBoundingClientRect(); if(nr.right<vr.left-40||nr.left>vr.right+40||nr.bottom<vr.top-40||nr.top>vr.bottom+40) continue;
       const p=posts[+i], [x,y]=tilePos(p,L2), or=oldRects.get(+i), finalTransform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
       el.getAnimations().forEach(anim=>anim.cancel());
@@ -390,6 +392,8 @@ function updateLevelUI(){ [...document.getElementById('levels').children].forEac
 
 // ---------- furniture ----------
 function renderAxis(){ const e=Z.k*LV[Z.L].pitch; axis.innerHTML=''; vlines.innerHTML=''; const frag=document.createDocumentFragment(), vf=document.createDocumentFragment(); const u0=(-Z.tx)/e, u1=(-Z.tx+Z.vw)/e;
+  const leftU=clamp(u0,0,Z.U-1), leftT=REV?1-leftU/(Z.U-1):leftU/(Z.U-1);
+  stickyYear.textContent=mode==='date'?String(new Date(T0+leftT*(T1-T0)).getUTCFullYear()):String(posts[clamp(Math.round(leftT*(N-1)),0,N-1)].year);
   const mk=(u,label,cls='')=>{ const x=Z.tx+u*e; if(x<-60||x>Z.vw+60) return; const d=document.createElement('div'); d.className='tk'+(cls?' '+cls:''); d.style.left=x+'px'; if(label){ const s=document.createElement('span'); s.textContent=label; d.appendChild(s);} frag.appendChild(d); const l=document.createElement('div'); l.className=cls.includes('minor')?'':'major'; l.style.left=x+'px'; vf.appendChild(l); };
   if(mode==='index'){ // year and month boundaries located at the first post of each year / month
     if(!Z.bounds){ Z.bounds=[]; let pm=''; for(const p of [...posts].sort((a,b)=>a.u-b.u)){ const ym=p.date.slice(0,7); if(ym!==pm){ Z.bounds.push({p,ym,year:pm===''||pm.slice(0,4)!==ym.slice(0,4)}); pm=ym; } } }
@@ -412,19 +416,24 @@ function renderAxis(){ const e=Z.k*LV[Z.L].pitch; axis.innerHTML=''; vlines.inne
       if(unit==='year') d=new Date(Date.UTC(y+1,0,1)); else if(unit==='quarter') d=new Date(Date.UTC(y,m+3,1)); else if(unit==='month') d=new Date(Date.UTC(y,m+1,1)); else if(unit==='week') d=new Date(d.getTime()+7*86400000); else d=new Date(d.getTime()+86400000); } }
   axis.appendChild(frag); vlines.appendChild(vf); }
 // Sticky copies of the run labels: one fades in at the left edge only while its run's own label has scrolled off to the left, and fades out again when the run ends.
-function renderGutter(){ const g=laneGeom(Z.L), pitch=LV[Z.L].pitch; if(!labels.children.length){ for(let d=0;d<K;d++){ const lb=document.createElement('div'); lb.className='pill lb'; lb.style.setProperty('--c',COLORS[d]); lb.innerHTML=`<i></i>${THEMES[d]}<span class="ct">${counts[d]}</span>`; lb.style.opacity=0; lb._vis=false; labels.appendChild(lb); } }
-  const cL=clamp(Math.floor(((-Z.tx)/Z.k)/pitch),0,g.C-1);
+function renderGutter(){ const g=laneGeom(Z.L); if(!labels.children.length){ for(let d=0;d<K;d++){ const lb=document.createElement('div'); lb.className='pill lb'; lb.style.setProperty('--c',COLORS[d]); lb.innerHTML=`<i></i>${THEMES[d]}`; lb.style.opacity=0; lb._vis=false; labels.appendChild(lb); } }
+  const worldLeft=(-Z.tx+8)/Z.k, cFloat=clamp(worldLeft/g.grid,0,g.C-1), cL=Math.floor(cFloat);
+  // A sticky label occupies several layout columns. Sample the highest local
+  // boundary under that whole footprint, then interpolate between columns so
+  // panning moves the label continuously instead of making it jump in 24px steps.
+  const localLabelTop=d=>{ const span=Math.max(1,Math.ceil(LBW[d]/g.grid)), sample=c=>{ let y=0; for(let i=c;i<=Math.min(g.C-1,c+span);i++) if(g.bandTops[d][i]>y) y=g.bandTops[d][i]; return y; }, a=sample(cL), b=sample(Math.min(g.C-1,cL+1)); return a+(b-a)*(cFloat-cL)+(HDR-22)/2; };
   for(let d=0;d<K;d++){ const lb=labels.children[d]; const runs=g.runs[d]; const run=runs.find(r=>r.c0<=cL&&cL<=r.c1); let show=false, y=0;
-    if(run){ const ownX=Z.tx+run.x*Z.k, endX=Z.tx+(run.c1+1)*pitch*Z.k, bot=Z.ty+g.bounds[d+1][cL]*Z.k; y=Z.ty+(g.bandTops[d][cL]+(HDR-22)/2)*Z.k; if(y<4) y=Math.min(4,bot-26); show = ownX<8 && endX>=8+LBW[d] && bot>26 && y<Z.vh; }
-    if(show){ const tf=`translate(8px,${y.toFixed(1)}px)`; if(!lb._vis){ lb.classList.remove('glide'); lb.style.transform=tf; void lb.offsetWidth; lb.style.opacity=1; lb._vis=true; requestAnimationFrame(()=>lb.classList.add('glide')); } else lb.style.transform=tf; }
-    else if(lb._vis){ lb.style.opacity=0; lb._vis=false; }
+    if(run){ const ownX=Z.tx+run.x*Z.k, endX=Z.tx+(run.c1+1)*g.grid*Z.k, bot=Z.ty+g.bounds[d+1][cL]*Z.k; y=Z.ty+localLabelTop(d)*Z.k; if(y<4) y=Math.min(4,bot-26); show = ownX<8 && endX>=8+LBW[d] && bot>26 && y<Z.vh; }
+    const runKey=run?`${run.c0}:${run.c1}`:'';
+    if(show){ lb.style.transform=`translate(8px,${y.toFixed(1)}px)`; lb.style.opacity=1; lb._vis=true; lb._runKey=runKey; }
+    else if(lb._vis){ lb.style.opacity=0; lb._vis=false; lb._runKey=''; }
     // one label per lane per screen: the sticky copy if it is showing, otherwise the leftmost run whose own label is on screen
-    let pick=null; if(!show){ pick=runs.find(r=>{ const sx=Z.tx+r.x*Z.k, ex=Z.tx+(r.c1+1)*pitch*Z.k; return ex>0 && sx>=8 && sx<Z.vw; })||null; }
+    let pick=null; if(!show){ pick=runs.find(r=>{ const sx=Z.tx+r.x*Z.k, ex=Z.tx+(r.c1+1)*g.grid*Z.k; return ex>0 && sx>=8 && sx<Z.vw; })||null; }
     for(const r of runs){ if(r.el) r.el.style.opacity = r===pick ? 1 : 0; } } }
 // The minimap draws the layout of the level you are on, squeezed to its box, so the box maps to the canvas exactly.
 function renderMini(){ const W=mini.clientWidth,H=mini.clientHeight; if(!W) return; const L=Z.L, g=laneGeom(L); if(!g) return; const sx=W/g.W, sy=H/g.H; const c=miniC; if(c.width!==W*2||c.height!==H*2){ c.width=W*2; c.height=H*2; Z.miniDirty=true; }
-  if(Z.miniDirty||Z.miniL!==L||Z.miniMode!==mode){ Z.miniDirty=false; Z.miniL=L; Z.miniMode=mode; const ctx=c.getContext('2d'); ctx.setTransform(2,0,0,2,0,0); ctx.clearRect(0,0,W,H); const cs=getComputedStyle(document.documentElement); const pitch=LV[L].pitch;
-    for(let d=0;d<K;d++){ const top=stepPts(g.bounds[d],g.C,pitch,g.W), bot=stepPts(g.bounds[d+1],g.C,pitch,g.W).reverse(); ctx.beginPath(); [...top,...bot].forEach((q,i)=>i?ctx.lineTo(q[0]*sx,q[1]*sy):ctx.moveTo(q[0]*sx,q[1]*sy)); ctx.closePath(); ctx.fillStyle=cs.getPropertyValue(COLORS[d].slice(4,-1)).trim()||'#888'; ctx.globalAlpha=.14; ctx.fill(); } ctx.globalAlpha=1;
+  if(Z.miniDirty||Z.miniL!==L||Z.miniMode!==mode){ Z.miniDirty=false; Z.miniL=L; Z.miniMode=mode; const ctx=c.getContext('2d'); ctx.setTransform(2,0,0,2,0,0); ctx.clearRect(0,0,W,H); const cs=getComputedStyle(document.documentElement);
+    for(let d=0;d<K;d++){ const shapes=L===1?[]:[{c0:0,c1:g.C-1,top:g.bounds[d],bot:g.bounds[d+1]}]; for(const s of shapes){ const top=stepRange(s.top,s.c0,s.c1,g.grid,g.W), bot=stepRange(s.bot,s.c0,s.c1,g.grid,g.W).reverse(); ctx.beginPath(); [...top,...bot].forEach((q,i)=>i?ctx.lineTo(q[0]*sx,q[1]*sy):ctx.moveTo(q[0]*sx,q[1]*sy)); ctx.closePath(); ctx.fillStyle=cs.getPropertyValue(COLORS[d].slice(4,-1)).trim()||'#888'; ctx.globalAlpha=.14; ctx.fill(); } } ctx.globalAlpha=1;
     for(const p of posts){ const [x,y]=p.pos[L]; ctx.fillStyle=cs.getPropertyValue(COLORS[p.th].slice(4,-1)).trim()||'#888'; ctx.globalAlpha=isFiltered(p)?0.15:0.9; ctx.fillRect(x*sx,y*sy,Math.max(1,p.w[L]*sx),Math.max(1,p.h[L]*sy)); } ctx.globalAlpha=1; }
   const x0=(-Z.tx)/Z.k, y0=(-Z.ty)/Z.k, x1=x0+Z.vw/Z.k, y1=y0+Z.vh/Z.k;
   miniR.style.left=clamp(x0*sx,0,W)+'px'; miniR.style.top=clamp(y0*sy,0,H)+'px'; miniR.style.width=Math.max(4,clamp(x1*sx,0,W)-clamp(x0*sx,0,W))+'px'; miniR.style.height=Math.max(4,clamp(y1*sy,0,H)-clamp(y0*sy,0,H))+'px'; }
@@ -450,6 +459,10 @@ function snapAfterPinch(){ if(Math.abs(Z.k-1)>1e-6) scheduleSnap(); }
 vp.addEventListener('pointerup',endPtr); vp.addEventListener('pointercancel',endPtr);
 vp.addEventListener('click',ev=>{ if(moved){ moved=false; return; } const el=tileAt(ev.clientX,ev.clientY); if(el){ const [x,y]=rel(ev); activateTile(el,x,y); } });
 function openReader(p){
+  // Opening the fixed reader changes the usable hover area before another
+  // pointermove necessarily occurs. Remove the transient hover card instead of
+  // leaving it stranded beneath the panel edge.
+  tip.hidden=true; Z.hover=null; document.querySelectorAll('.tile.hit').forEach(n=>n.classList.remove('hit'));
   const url=BASE+p.slug+'/';
   openPostIndex=p.i;
   for(const i in Z.el) Z.el[i].classList.toggle('open',+i===openPostIndex);
@@ -558,8 +571,6 @@ const initial=readHash(); computeUnits(); layoutWorld();
 if(initial){ const [nx,ny]=absToWorld({u:initial.u*Z.U,lane:clamp(initial.lane,0,K-1),f:initial.f},Z.L); Z.tx=Z.vw/2-nx; Z.ty=Z.vh/2-ny; }
 clampPan(); applyCamera(); sync(true); updateLevelUI();
 let rs=0; addEventListener('resize',()=>{ clearTimeout(rs); rs=setTimeout(()=>{ const a=worldToAbs((Z.vw/2-Z.tx)/Z.k,(Z.vh/2-Z.ty)/Z.k,Z.L); computeUnits(); layoutWorld(); const [nx,ny]=absToWorld({u:a.u/ (Z.U) * Z.U,lane:a.lane,f:a.f},Z.L); Z.tx=Z.vw/2-nx*Z.k; Z.ty=Z.vh/2-ny*Z.k; clampPan(); Z.miniDirty=true; applyCamera(); sync(true); },120); });
-matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',()=>{ Z.miniDirty=true; renderMini(); });
-
 window.Z=Z; window.goLevel=goLevel; window.LV=LV; window.clampPan=clampPan; window.applyCamera=applyCamera; window.sync=sync;
 </script>
 
